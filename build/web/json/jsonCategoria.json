@@ -1,0 +1,22 @@
+[
+    {
+        "descripcion": "Verduras",
+        "tipo": "Alimento",
+        "estatus": "Activo"
+    },
+    {
+        "descripcion": "Bebidas sin alcohol",
+        "tipo": "Bebida",
+        "estatus": "Activo"
+    },
+    {
+        "descripcion": "Frutas",
+        "tipo": "Alimento",
+        "estatus": "Activo"
+    },
+    {
+        "descripcion": "Bebidas alcohólicas",
+        "tipo": "Bebida",
+        "estatus": "Activo"
+    }
+]

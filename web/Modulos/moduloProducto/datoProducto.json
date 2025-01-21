@@ -1,0 +1,42 @@
+[ 
+    {
+        "nombre": "Burritos",
+        "descripcion": "Tres burritos del guisado de su preferencia",
+        "foto": "burritos.jpg",
+        "precio": "145",
+        "tipo": "C",
+        "estatus": "Activo"
+    }, 
+    {
+        "nombre": "Flautas",
+        "descripcion": "Cuatro flautas de deshebrada",
+        "foto": "flautas.jpg",
+        "precio": "135",
+        "tipo": "C",
+        "estatus": "Activo"
+    }, 
+    {
+        "nombre": "Guacamole",
+        "descripcion": "Puré de aguacate con totopos",
+        "foto": "guacamole.jpg",
+        "precio": "85",
+        "tipo": "C",
+        "estatus": "Activo"
+    }, 
+    {
+        "nombre": "Menudo",
+        "descripcion": "Menudo de pancita",
+        "foto": "menudo.jpg",
+        "precio": "225",
+        "tipo": "C",
+        "estatus": "Activo"
+    }, 
+    {
+        "nombre": "Chocolate",
+        "descripcion": "Chocolate oaxaqueño con leche",
+        "foto": "chocolate.jpg",
+        "precio": "46",
+        "tipo": "B",
+        "estatus": "Activo"
+    }  
+]

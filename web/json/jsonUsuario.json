@@ -1,0 +1,57 @@
+[
+    {
+        "username": "admin",
+        "password": "Admin@1234",
+        "estatus": "Activo"
+    },
+    {
+        "username": "richi",
+        "password": "Richi@2024!",
+        "estatus": "Activo"
+    },
+    {
+        "username": "coper",
+        "password": "Coper@3214#",
+        "estatus": "Activo"
+    },
+    {
+        "username": "arturo",
+        "password": "Arturo#4321!",
+        "estatus": "Activo"
+    },
+    {
+        "username": "erick",
+        "password": "Erick#2024@",
+        "estatus": "Activo"
+    },
+    {
+        "username": "yoss",
+        "password": "Yoss@1357!",
+        "estatus": "Activo"
+    },
+    {
+        "username": "marcos",
+        "password": "Marcos@6789#",
+        "estatus": "Activo"
+    },
+    {
+        "username": "diana",
+        "password": "Diana#2468@",
+        "estatus": "Activo"
+    },
+    {
+        "username": "alejandra",
+        "password": "Alejandra#2024!",
+        "estatus": "Activo"
+    },
+    {
+        "username": "roberto",
+        "password": "Roberto@9876#",
+        "estatus": "Activo"
+    },
+    {
+        "username": "luisa",
+        "password": "Luisa@1357#",
+        "estatus": "Activo"
+    }
+]
