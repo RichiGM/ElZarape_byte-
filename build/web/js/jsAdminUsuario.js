@@ -44,8 +44,6 @@ document.addEventListener("DOMContentLoaded", () => {
     cargarTabla();
     cargarEstados();
     cargarSucursales();
-
-    document.getElementById("txtTelefono").addEventListener("input", validarTelefono);
 });
 
 // Función para cargar la tabla de usuarios desde la API
@@ -148,13 +146,6 @@ async function obtenerEstadoPorCiudad(idCiudad) {
     }
 }
 
-// Limpiar errores del formulario
-function limpiarErrores() {
-    const telefonoError = document.getElementById("telefonoError");
-    telefonoError.style.display = "none";
-    document.getElementById("txtTelefono").classList.remove("is-invalid");
-}
-
 // Generar una contraseña aleatoria
 window.generarContrasenia = function () {
     const longitud = 12;
@@ -192,56 +183,17 @@ window.mostrarOcultarContrasenia = function () {
     }
 };
 
-
-// Validación de contraseña
-function validarContrasenia(contrasenia) {
-    const tieneLongitud = contrasenia.length >= 12;
-    const tieneMayuscula = /[A-Z]/.test(contrasenia);
-    const tieneEspecial = /[!@#$%^&*()\-_=+\[\]{}|;:,.<>?]/.test(contrasenia);
-
-    return tieneLongitud && tieneMayuscula && tieneEspecial;
-}
-
-// Validación de teléfono
-function validarTelefono() {
-    const telefono = document.getElementById("txtTelefono").value.trim();
-    const telefonoError = document.getElementById("telefonoError");
-
-    if (/^\d{10}$/.test(telefono)) {
-        telefonoError.style.display = "none";
-        document.getElementById("txtTelefono").classList.remove("is-invalid");
-        return true;
-    } else {
-        telefonoError.style.display = "block";
-        telefonoError.textContent = "El número debe tener exactamente 10 dígitos.";
-        telefonoError.classList.add("text-danger");
-        document.getElementById("txtTelefono").classList.add("is-invalid");
-        return false;
-    }
-}
-
 // Agregar un usuario
 async function agregarUsuario() {
-    if (!validarCamposLlenos()) {
-        notyf.error("Por favor, completa todos los campos antes de agregar un usuario.");
-        return;
-    }
-    if (!validarTelefono()) {
-        notyf.error("El número de teléfono debe contener exactamente 10 dígitos.");
-        return;
-    }
-
-    const contrasenia = document.getElementById("txtContrasenia").value;
-
-    if (!validarContrasenia(contrasenia)) {
-        notyf.error("La contraseña debe tener al menos 12 caracteres, incluir una letra mayúscula y un carácter especial.");
+    if (!validarFormulario()) {
+        notyf.error("Por favor, completa correctamente todos los campos antes de agregar un usuario.");
         return;
     }
 
     try {
         const data = new URLSearchParams({
             nombreUsuario: document.getElementById("txtNombreUsuario").value,
-            contrasenia: contrasenia,
+            contrasenia: document.getElementById("txtContrasenia").value,
             nombrePersona: document.getElementById("txtNombrePersona").value,
             apellidosPersona: document.getElementById("txtApellidosPersona").value,
             telefono: document.getElementById("txtTelefono").value,
@@ -278,22 +230,10 @@ async function modificarUsuario() {
         notyf.error("Debes seleccionar un usuario antes de modificar.");
         return;
     }
-    if (!validarCamposLlenos()) {
+    if (!validarFormulario()()) {
         notyf.error("Por favor, completa todos los campos antes de modificar un usuario.");
         return;
     }
-    if (!validarTelefono()) {
-        notyf.error("El número de teléfono debe contener exactamente 10 dígitos.");
-        return;
-    }
-
-    const contrasenia = document.getElementById("txtContrasenia").value;
-
-    if (!validarContrasenia(contrasenia)) {
-        notyf.error("La contraseña debe tener al menos 12 caracteres, incluir una letra mayúscula y un carácter especial.");
-        return;
-    }
-
     const data = {
         idUsuario: usuarioSeleccionado.usuario.idUsuario || 0,
         nombreUsuario: document.getElementById("txtNombreUsuario").value || "",
@@ -497,31 +437,6 @@ function mostrarSucursal(tipo) {
     }
 }
 
-// Validar campos llenos
-function validarCamposLlenos() {
-    const getCampo = id => document.getElementById(id) || {value: ""};
-
-    const tipoEntidad = getCampo("txtTipoEntidad").value.trim().toLowerCase();
-    const campos = [
-        getCampo("txtNombreUsuario"),
-        getCampo("txtContrasenia"),
-        getCampo("txtNombrePersona"),
-        getCampo("txtApellidosPersona"),
-        getCampo("txtTelefono"),
-        getCampo("txtCiudad"),
-        getCampo("txtTipoEntidad")
-    ];
-
-    if (tipoEntidad === "empleado") {
-        campos.push(getCampo("txtSucursal"));
-    }
-
-    const camposCompletos = campos.every(campo => campo.value.trim() !== "");
-    if (!camposCompletos) {
-        notyf.error("Por favor, completa todos los campos obligatorios.");
-    }
-    return camposCompletos;
-}
 
 // Filtrar usuarios
 async function filtrarUsuarios() {
@@ -570,3 +485,138 @@ async function filtrarUsuarios() {
 
 // Vincular el evento de búsqueda
 document.getElementById("searchInput").addEventListener("input", filtrarUsuarios);
+function validarFormulario() {
+    const mensajesCampos = {
+        txtNombreUsuario: "El 'Nombre de Usuario' es obligatorio, debe contener entre 3 y 65 caracteres, permitiendo solo alfanuméricos y guiones bajos, y no se permiten malas palabras.",
+        txtContrasenia: "La 'Contraseña' es obligatoria, debe tener al menos 12 caracteres, incluyendo una mayúscula, un número y un carácter especial, y no se permiten malas palabras.",
+        txtNombrePersona: "El campo 'Nombre' es obligatorio, solo debe contener letras, y no se permiten malas palabras.",
+        txtApellidosPersona: "El campo 'Apellidos' es obligatorio, solo debe contener letras, y no se permiten malas palabras.",
+        txtTelefono: "El 'Teléfono' es obligatorio y debe seguir el formato 477-777-77-77.",
+        txtEstado: "Debe seleccionar un estado.",
+        txtCiudad: "Debe seleccionar una ciudad.",
+        txtTipoEntidad: "Debe seleccionar un tipo de entidad.",
+        txtSucursal: "Debe seleccionar una sucursal si el tipo de entidad es 'empleado'.",
+    };
+
+    let formularioValido = true;
+
+    // Validar cada campo según los mensajes especificados
+    Object.keys(mensajesCampos).forEach((campoId) => {
+        const elemento = document.getElementById(campoId);
+        const texto = elemento.value.trim();
+        const mensajeError = mensajesCampos[campoId];
+
+        // Buscar o crear el div de error
+        let feedback = elemento.nextElementSibling;
+        if (!feedback || !feedback.classList.contains("invalid-feedback")) {
+            feedback = document.createElement("div");
+            feedback.className = "invalid-feedback";
+            elemento.parentNode.appendChild(feedback);
+        }
+
+        // Asegurarse de que no haya feedbacks duplicados
+        const existingFeedbacks = Array.from(
+            elemento.parentNode.querySelectorAll(".invalid-feedback")
+        );
+        existingFeedbacks.forEach((fb, index) => {
+            if (fb !== feedback) {
+                fb.remove();
+            }
+        });
+
+        // Validar si el campo está vacío
+        if (!texto) {
+            if (campoId === "txtSucursal" && document.getElementById("txtTipoEntidad").value === "cliente") {
+                feedback.style.display = "none";
+                elemento.classList.remove("is-invalid");
+                return;
+            }
+
+            elemento.classList.add("is-invalid");
+            feedback.textContent = mensajeError;
+            feedback.style.display = "block";
+            formularioValido = false;
+        } else {
+            let valido = true;
+
+            // Verificar formato específico y malas palabras
+            switch (campoId) {
+                case "txtNombreUsuario":
+                    valido = /^[a-zA-Z0-9_]{3,65}$/.test(texto);
+                    break;
+                case "txtContrasenia":
+                    valido = validarContrasenia(texto);
+                    break;
+                case "txtNombrePersona":
+                case "txtApellidosPersona":
+                    valido = /^[A-Za-z\s]+$/.test(texto);
+                    break;
+                case "txtTelefono":
+                    valido = /^\d{3}-\d{3}-\d{2}-\d{2}$/.test(texto);
+                    break;
+                case "txtEstado":
+                case "txtCiudad":
+                case "txtTipoEntidad":
+                    valido = texto !== "";
+                    break;
+                case "txtSucursal":
+                    if (document.getElementById("txtTipoEntidad").value === "empleado") {
+                        valido = texto !== "";
+                    }
+                    break;
+            }
+
+            // Validar si contiene malas palabras en los campos indicados
+            if (
+                ["txtNombreUsuario", "txtContrasenia", "txtNombrePersona", "txtApellidosPersona"].includes(campoId) &&
+                contieneMalasPalabras(texto)
+            ) {
+                valido = false;
+                feedback.textContent = "El campo contiene lenguaje inapropiado.";
+                feedback.style.display = "block";
+                formularioValido = false;
+            }
+
+            if (!valido) {
+                elemento.classList.add("is-invalid");
+                feedback.textContent = mensajeError;
+                feedback.style.display = "block";
+                formularioValido = false;
+            } else {
+                elemento.classList.remove("is-invalid");
+                feedback.style.display = "none";
+            }
+        }
+    });
+
+    return formularioValido;
+}
+
+function validarContrasenia(contrasenia) {
+    const tieneLongitud = contrasenia.length >= 12;
+    const tieneMayuscula = /[A-Z]/.test(contrasenia);
+    const tieneNumero = /[0-9]/.test(contrasenia);
+    const tieneEspecial = /[!@#$%^&*()\-_=+\[\]{}|;:,.<>?]/.test(contrasenia);
+    return tieneLongitud && tieneMayuscula && tieneNumero && tieneEspecial;
+}
+
+function contieneMalasPalabras(texto) {
+    const malasPalabras = [
+        "idiota", "imbécil", "estúpido", "tonto", "bobo", "menso", "tarado", "loco",
+        "inútil", "baboso", "gilipollas", "huevón", "fregado", "burro", "torpe",
+        "mierda", "basura", "asco", "pendejo", "cabrón", "puto", "puta", "perra",
+        "zorra", "chingar", "joder", "coño", "carajo", "mamón", "chingada", "chingado",
+        "maldito", "malparido", "ojete", "pelotudo", "culero", "cabrona", "putazo",
+        "chingón", "chingona", "verga", "pinche", "culiao", "mierdero", "gil",
+        "estúpida", "babosa", "burra", "basofia", "desgraciado", "culito",
+        "retrasado", "anormal", "baboso", "hueca", "grosera", "cornudo",
+        "cornuda", "boludo", "malnacido", "corrupto", "estafador", "tramposo",
+        "traidor", "farsante", "malcriado", "pedazo de mierda", "infeliz",
+        "hijo de puta", "cabeza hueca", "patán", "sinvergüenza", "holgazán",
+        "haragán", "gandul", "bribón", "truhan", "bandido", "villano", "idiota",
+        "cretino", "tarúpido", "torombolo", "gordinflón", "cuadrúpedo",
+        "grotesco", "tontín", "babieca", "tarúpido", "canalla", "sin remedio", "chingue su madre",
+        "cabron", "estupido de mierda"
+    ];
+    return malasPalabras.some((palabra) => texto.toLowerCase().includes(palabra));
+}

@@ -16,6 +16,26 @@ const notyf = new Notyf({
     ],
 });
 
+const malasPalabras = [
+    "idiota", "imbécil", "estúpido", "tonto", "bobo", "menso", "tarado", "loco",
+    "inútil", "baboso", "gilipollas", "huevón", "fregado", "burro", "torpe",
+    "mierda", "basura", "asco", "pendejo", "cabrón", "puto", "puta", "perra",
+    "zorra", "chingar", "joder", "coño", "carajo", "mamón", "chingada", "chingado",
+    "maldito", "malparido", "ojete", "pelotudo", "culero", "cabrona", "putazo",
+    "chingón", "chingona", "verga", "pinche", "culiao", "mierdero", "gil", 
+    "estúpida", "babosa", "burra", "basofia", "desgraciado", "culito", 
+    "retrasado", "anormal", "baboso", "hueca", "grosera", "cornudo",
+    "cornuda", "boludo", "malnacido", "corrupto", "estafador", "tramposo",
+    "traidor", "farsante", "malcriado", "pedazo de mierda", "infeliz", 
+    "hijo de puta", "cabeza hueca", "patán", "sinvergüenza", "holgazán",
+    "haragán", "gandul", "bribón", "truhan", "bandido", "villano", "idiota",
+    "cretino", "tarúpido", "torombolo", "gordinflón", "cuadrúpedo", 
+    "grotesco", "tontín", "babieca", "tarúpido", "canalla", "sin remedio", "chingue su madre",
+    "cabron", "estupido de mierda"
+];
+
+
+
 // Inicialización de botones y variables globales
 const btnModificar = document.getElementById("btnModificar");
 const btnCambiarEstatus = document.getElementById("btnCambiarEstatus");
@@ -33,6 +53,12 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 let sucursales = []; // Lista de sucursales cargadas desde el servidor
+
+// funcion para detectar malas palabras
+function contieneMalasPalabras(texto) {
+    const textoNormalizado = texto.toLowerCase(); // Convertir a minúsculas para comparación
+    return malasPalabras.some((palabra) => textoNormalizado.includes(palabra));
+}
 
 // Función para cargar las sucursales desde el servidor
 function cargarSucursales() {
@@ -167,8 +193,6 @@ function actualizarTabla(data) {
 }
 
 
-
-
 // Función para convertir la imagen a Base64 con el prefijo intacto
 function convertToBase64(event) {
     const file = event.target.files[0];
@@ -193,6 +217,13 @@ async function seleccionarSucursal(sucursal) {
         console.error("Error: Sucursal no encontrada.");
         return;
     }
+
+    // Limpia los estilos de error antes de llenar los campos
+    const campos = document.querySelectorAll(".is-invalid");
+    campos.forEach((campo) => campo.classList.remove("is-invalid"));
+
+    const feedbacks = document.querySelectorAll(".invalid-feedback");
+    feedbacks.forEach((feedback) => (feedback.style.display = "none"));
 
     console.log("Sucursal seleccionada:", sucursal);
 
@@ -240,8 +271,6 @@ async function seleccionarSucursal(sucursal) {
 
 
 
-
-
 // Función para limpiar el formulario
 function limpiar() {
     document.getElementById("sucursalForm").reset();
@@ -258,7 +287,15 @@ function limpiar() {
     btnModificar.style.display = "none";
     btnCambiarEstatus.style.display = "none";
     btnAgregar.style.display = "inline-block";
+
+    // Eliminar estilos de error
+    const campos = document.querySelectorAll(".is-invalid");
+    campos.forEach((campo) => campo.classList.remove("is-invalid"));
+
+    const feedbacks = document.querySelectorAll(".invalid-feedback");
+    feedbacks.forEach((feedback) => (feedback.style.display = "none"));
 }
+
 
 
 // Función para agregar una sucursal
@@ -355,50 +392,161 @@ function cambiarEstatus() {
         });
 }
 
+//validar duplicados de nombres
+function esNombreDuplicado(nombre) {
+    return sucursales.some((sucursal) => sucursal.nombre.trim().toLowerCase() === nombre.trim().toLowerCase());
+}
+
+
 // Función para validar el formulario
 function validarFormulario() {
-    const camposRequeridos = ["txtNombre", "txtLatitud", "txtLongitud", "txtCalle", "txtUrlWeb", "txtHorarios","txtNumCalle", "txtColonia","selectEstado", "selectCiudad"];
-    for (let campo of camposRequeridos) {
-        const elemento = document.getElementById(campo);
-        if (!elemento || elemento.value.trim() === "") {
-            notyf.error("Todos los campos requeridos deben llenarse.");
-            return false;
+    const mensajesCampos = {
+        txtNombre: "El campo 'Nombre de la Sucursal' es obligatorio.",
+        txtLatitud: "El campo 'Latitud' es obligatorio y debe estar entre -90 y 90 grados.",
+        txtLongitud: "El campo 'Longitud' es obligatorio y debe estar entre -180 y 180 grados.",
+        txtUrlWeb: "El campo 'URL Web' es obligatorio y debe comenzar con 'http://' o 'https://'.",
+        txtHorarios: "El campo 'Horarios' es obligatorio y debe tener un formato como 'Lunes a Viernes 9:00 - 18:00'.",
+        txtCalle: "El campo 'Calle' es obligatorio.",
+        txtNumCalle: "El campo 'Número de la Calle' es obligatorio.",
+        txtColonia: "El campo 'Colonia' es obligatorio.",
+        selectEstado: "Debe seleccionar un estado.",
+        selectCiudad: "Debe seleccionar una ciudad.",
+    };
+
+    let formularioValido = true;
+
+    // Validar cada campo según los mensajes especificados
+    Object.keys(mensajesCampos).forEach((campoId) => {
+        const elemento = document.getElementById(campoId);
+        const texto = elemento.value.trim();
+        const mensajeError = mensajesCampos[campoId];
+
+        // Crear o encontrar el div de error
+        let feedback = elemento.nextElementSibling;
+        if (!feedback || !feedback.classList.contains("invalid-feedback")) {
+            feedback = document.createElement("div");
+            feedback.className = "invalid-feedback";
+            elemento.parentNode.appendChild(feedback);
         }
+
+        // Validar si el campo está vacío
+        if (!texto) {
+            elemento.classList.add("is-invalid");
+            feedback.textContent = mensajeError;
+            feedback.style.display = "block";
+            formularioValido = false;
+        } 
+        // Validar si contiene malas palabras
+        else if (contieneMalasPalabras(texto)) {
+            elemento.classList.add("is-invalid");
+            feedback.textContent = "El campo contiene lenguaje inapropiado.";
+            feedback.style.display = "block";
+            formularioValido = false;
+        
+        } 
+         // Validar nombres duplicados (aplicable solo al campo 'txtNombre')
+        else if (campoId === "txtNombre" && esNombreDuplicado(texto) && !indexSucursalSeleccionada) {
+            elemento.classList.add("is-invalid");
+            feedback.textContent = "El nombre de la sucursal ya está registrado.";
+            feedback.style.display = "block";
+            formularioValido = false;
+        }
+        else {
+            elemento.classList.remove("is-invalid");
+            feedback.style.display = "none";
+        }
+    });
+
+    // Validar rango de latitud
+    const latitud = parseFloat(document.getElementById("txtLatitud").value);
+    if (isNaN(latitud) || latitud < -90 || latitud > 90) {
+        const elemento = document.getElementById("txtLatitud");
+        elemento.classList.add("is-invalid");
+        const feedback = elemento.nextElementSibling;
+        feedback.textContent = "La latitud debe estar entre -90 y 90 grados.";
+        feedback.style.display = "block";
+        formularioValido = false;
     }
 
+    // Validar rango de longitud
+    const longitud = parseFloat(document.getElementById("txtLongitud").value);
+    if (isNaN(longitud) || longitud < -180 || longitud > 180) {
+        const elemento = document.getElementById("txtLongitud");
+        elemento.classList.add("is-invalid");
+        const feedback = elemento.nextElementSibling;
+        feedback.textContent = "La longitud debe estar entre -180 y 180 grados.";
+        feedback.style.display = "block";
+        formularioValido = false;
+    }
+
+    // Validar formato de URL
+    const urlWeb = document.getElementById("txtUrlWeb").value.trim();
+    if (!/^https?:\/\/.+/.test(urlWeb)) {
+        const elemento = document.getElementById("txtUrlWeb");
+        elemento.classList.add("is-invalid");
+        const feedback = elemento.nextElementSibling;
+        feedback.textContent = "El campo 'URL Web' debe comenzar con 'http://' o 'https://'.";
+        feedback.style.display = "block";
+        formularioValido = false;
+    }
+
+    // Validar formato de horarios
+    const horarios = document.getElementById("txtHorarios").value.trim();
+    const regexHorarios = /^[A-Za-z\sáéíóúÁÉÍÓÚñÑ]+ \d{1,2}:\d{2} - \d{1,2}:\d{2}$/;
+    if (!regexHorarios.test(horarios)) {
+        const elemento = document.getElementById("txtHorarios");
+        elemento.classList.add("is-invalid");
+        const feedback = elemento.nextElementSibling;
+        feedback.textContent = "El campo 'Horarios' debe tener un formato como 'Lunes a Viernes 9:00 - 18:00'.";
+        feedback.style.display = "block";
+        formularioValido = false;
+    }
+
+    // Validar si se cargó una imagen
     const foto = imagenBase64 || document.getElementById("txtFoto").src;
-    if (!foto || foto.includes("placeholder")) {
-        notyf.error("Debe cargar una imagen válida.");
-        return false;
+    const txtFoto = document.getElementById("txtFoto");
+    const contenedorFoto = document.getElementById("txtFotoRuta").parentNode;
+    let feedbackFoto = contenedorFoto.querySelector(".invalid-feedback");
+
+    if (!feedbackFoto) {
+        feedbackFoto = document.createElement("div");
+        feedbackFoto.className = "invalid-feedback";
+        contenedorFoto.appendChild(feedbackFoto);
     }
 
-    return true;
+    if (!foto || foto.includes("placeholder")) {
+        txtFoto.classList.add("is-invalid");
+        contenedorFoto.classList.add("is-invalid");
+        feedbackFoto.textContent = "Debe cargar una imagen válida.";
+        feedbackFoto.style.display = "block";
+        formularioValido = false;
+    } else {
+        txtFoto.classList.remove("is-invalid");
+        contenedorFoto.classList.remove("is-invalid");
+        feedbackFoto.style.display = "none";
+    }
+
+    return formularioValido;
 }
+
+
 
 // Ajustar la función para obtener los datos del formulario
 function obtenerDatosFormulario() {
     const nombre = document.getElementById("txtNombre").value.trim();
-    const latitud = document.getElementById("txtLatitud").value.trim();
-    const longitud = document.getElementById("txtLongitud").value.trim();
+    const latitud = parseFloat(document.getElementById("txtLatitud").value);
+    const longitud = parseFloat(document.getElementById("txtLongitud").value);
     const urlWeb = document.getElementById("txtUrlWeb").value.trim();
     const horarios = document.getElementById("txtHorarios").value.trim();
     const calle = document.getElementById("txtCalle").value.trim();
     const numCalle = document.getElementById("txtNumCalle").value.trim();
     const colonia = document.getElementById("txtColonia").value.trim();
     const idCiudad = parseInt(document.getElementById("selectCiudad").value, 10);
-    const foto = imagenBase64 || document.getElementById("txtFoto").src; // Usar Base64 o la imagen existente
+    const foto = imagenBase64 || document.getElementById("txtFoto").src;
 
-    if (!idCiudad || isNaN(idCiudad)) {
-        notyf.error("Seleccione una ciudad válida.");
-        return null;
-    }
+    // Validar formulario antes de continuar
+    if (!validarFormulario()) return null;
 
-    if (!foto || foto.includes("placeholder")) {
-        notyf.error("Debe cargar una imagen válida.");
-        return null;
-    }
-     if (!validarFormulario()) 
-         return;
     return {
         nombre,
         latitud,
@@ -414,6 +562,8 @@ function obtenerDatosFormulario() {
         foto,
     };
 }
+
+
 
 // Función para buscar sucursales
 function buscarSucursales() {
