@@ -26,20 +26,55 @@
                                    title="Debe contener entre 3 y 65 caracteres, solo alfanuméricos y guiones bajos">
                         </div>
 
-                        <!-- Contraseña -->
-                        <div class="mb-3">
-                            <label for="txtContrasenia" class="form-label">Contraseña <span class="text-danger">*</span></label>
-                            <div class="input-group">
-                                <input type="password" class="form-control" id="txtContrasenia" name="txtContrasenia" required>
-                                <button type="button" class="btn btn-outline-secondary" onclick="generarContrasenia();">Generar</button>
-                                <button type="button" class="btn btn-outline-secondary" id="togglePassword" onclick="mostrarOcultarContrasenia();">
-                                    Mostrar
+                        <!-- Botón para habilitar la modificación de contraseña -->
+                        <div id="divModificarContrasenia" class="cancel-container" style="display: none;">
+                            <button type="button" id="btnModificarContrasenia" onclick="habilitarCambioContrasenia();">
+                                Cambiar Contraseña
+                            </button>
+                        </div>
+
+                        <!-- Contenedor de los campos de contraseña -->
+                        <!-- Contenedor de los campos de contraseña -->
+                        <div id="divCamposContrasenia">
+                            <!-- Contraseña -->
+                            <div class="mb-3">
+                                <label for="txtContrasenia" class="form-label">Contraseña <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="txtContrasenia" name="txtContrasenia" required>
+                                    <button type="button" class="btn btn-outline-secondary" onclick="generarContrasenia();" id="btnGenerarContrasenia">
+                                        Generar
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary" id="togglePassword" onclick="mostrarOcultarContrasenia();">
+                                        Mostrar
+                                    </button>
+                                </div>
+                                <small id="passwordHelp" class="text-muted">
+                                    La contraseña debe tener al menos 12 caracteres, incluyendo una mayúscula, un número y un carácter especial.
+                                </small>
+                            </div>
+
+                            <!-- Confirmar Contraseña -->
+                            <div class="mb-3">
+                                <label for="txtConfirmarContrasenia" class="form-label">Confirmar Contraseña <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="txtConfirmarContrasenia" name="txtConfirmarContrasenia" required>
+                                    <button type="button" class="btn btn-outline-secondary" id="toggleConfirmPassword" onclick="mostrarOcultarConfirmarContrasenia();">
+                                        Mostrar
+                                    </button>
+                                </div>
+                                <small id="confirmPasswordHelp" class="text-muted">
+                                    Debe coincidir con la contraseña ingresada.
+                                </small>
+                            </div>
+
+                            <!-- Botón de cancelar cambio de contraseña -->
+                            <div class="cancel-container">
+                                <button type="button" id="btnCancelarCambioContrasenia" style="display: none;" class="btn-cancelar" onclick="cancelarCambioContrasenia();">
+                                    ❌ Cancelar Cambio de Contraseña
                                 </button>
                             </div>
-                            <small id="passwordHelp" class="text-muted">
-                                La contraseña debe tener al menos 12 caracteres, incluyendo una mayúscula, un número y un carácter especial.
-                            </small>
                         </div>
+
 
 
                         <!-- Nombre -->

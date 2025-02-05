@@ -5,6 +5,7 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import com.google.gson.JsonObject;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.utl.dsm.zarape.controller.ControllerUsuario;
 import org.utl.dsm.zarape.model.LoginRequest;
 
@@ -19,9 +20,9 @@ public class RestLogin {
         JsonObject json = new Gson().fromJson(jsonString, JsonObject.class);
         String username = json.get("username").getAsString();
         String password = json.get("password").getAsString();
-
+        String passwordHash = DigestUtils.sha256Hex(password);
         ControllerUsuario controller = new ControllerUsuario();
-        boolean isValid = controller.validateUser(username, password);
+        boolean isValid = controller.validateUser(username, passwordHash);
 
         JsonObject response = new JsonObject();
         response.addProperty("success", isValid);

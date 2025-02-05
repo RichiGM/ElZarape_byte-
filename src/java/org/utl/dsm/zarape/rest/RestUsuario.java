@@ -13,6 +13,7 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Application;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.utl.dsm.zarape.controller.ControllerUsuario;
 import org.utl.dsm.zarape.model.Persona;
 import org.utl.dsm.zarape.model.Usuario;
@@ -37,7 +38,8 @@ public class RestUsuario extends Application {
         String out;
         ControllerUsuario controller = new ControllerUsuario();
         try {
-            Usuario usuario = new Usuario(0, nombreUsuario, contrasenia, 1);
+            String passwordHash = DigestUtils.sha256Hex(contrasenia);
+            Usuario usuario = new Usuario(0, nombreUsuario, passwordHash, 1);
             Persona persona = new Persona(0, nombrePersona, apellidosPersona, telefono, idCiudad, "");
 
             controller.insert(usuario, persona, tipoEntidad, idSucursal == 0 ? null : idSucursal);
@@ -55,25 +57,23 @@ public class RestUsuario extends Application {
     }
 
     // Modificar Usuario
-    @Path("update")
+    // Modificar Usuario (sin modificar contraseña)
+    @Path("updateSinContrasenia")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response updateUsuario(String jsonInput) {
+    public Response updateUsuarioSinContrasenia(String jsonInput) {
         String out;
         ControllerUsuario controller = new ControllerUsuario();
         Gson gson = new Gson();
         try {
-            // Log del JSON recibido
-            System.out.println("JSON recibido en el REST: " + jsonInput);
+            System.out.println("JSON recibido en el REST (Sin Contraseña): " + jsonInput);
 
-            // Intentar deserializar el JSON
             JsonObject jsonObject = gson.fromJson(jsonInput, JsonObject.class);
 
             // Procesar el JSON
             int idUsuario = jsonObject.get("idUsuario").getAsInt();
             String nombreUsuario = jsonObject.get("nombreUsuario").getAsString();
-            String contrasenia = jsonObject.get("contrasenia").getAsString();
             int idPersona = jsonObject.get("idPersona").getAsInt();
             String nombrePersona = jsonObject.get("nombrePersona").getAsString();
             String apellidosPersona = jsonObject.get("apellidosPersona").getAsString();
@@ -84,23 +84,61 @@ public class RestUsuario extends Application {
                     ? jsonObject.get("idSucursal").getAsInt()
                     : null;
 
-            // Crear objetos
-            Usuario usuario = new Usuario(idUsuario, nombreUsuario, contrasenia, 1);
+            // Crear objetos sin contraseña
+            Usuario usuario = new Usuario(idUsuario, nombreUsuario, null, 1);
             Persona persona = new Persona(idPersona, nombrePersona, apellidosPersona, telefono, idCiudad, "");
 
-            System.out.println("Datos deserializados correctamente.");
+            System.out.println("Datos deserializados correctamente (Sin Contraseña).");
 
             // Llamar al controlador
-            controller.update(usuario, persona, tipoEntidad, idSucursal);
+            controller.updateSinContrasenia(usuario, persona, tipoEntidad, idSucursal);
 
             out = """
-              {"result":"Usuario modificado correctamente REST"}
-              """;
+          {"result":"Usuario modificado correctamente (Sin Contraseña)"}
+          """;
         } catch (Exception e) {
             e.printStackTrace();
             out = String.format("""
-              {"result":"Error al modificar el usuario REST: %s"}
-              """, e.getMessage());
+          {"result":"Error al modificar el usuario (Sin Contraseña): %s"}
+          """, e.getMessage());
+        }
+        return Response.ok(out).build();
+    }
+
+// Modificar solo la contraseña del usuario
+    @Path("updatePassword")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response updateUsuarioContrasenia(String jsonInput) {
+        String out;
+        ControllerUsuario controller = new ControllerUsuario();
+        Gson gson = new Gson();
+        try {
+            System.out.println("JSON recibido en el REST (Solo Contraseña): " + jsonInput);
+
+            JsonObject jsonObject = gson.fromJson(jsonInput, JsonObject.class);
+
+            // Procesar el JSON
+            int idUsuario = jsonObject.get("idUsuario").getAsInt();
+            String nuevaContrasenia = jsonObject.get("nuevaContrasenia").getAsString();
+
+            // Encriptar la nueva contraseña
+            String passwordHash = DigestUtils.sha256Hex(nuevaContrasenia);
+
+            System.out.println("Datos deserializados correctamente (Solo Contraseña).");
+
+            // Llamar al controlador para modificar solo la contraseña
+            controller.updateContrasenia(idUsuario, passwordHash);
+
+            out = """
+          {"result":"Contraseña modificada correctamente"}
+          """;
+        } catch (Exception e) {
+            e.printStackTrace();
+            out = String.format("""
+          {"result":"Error al modificar la contraseña: %s"}
+          """, e.getMessage());
         }
         return Response.ok(out).build();
     }
@@ -130,24 +168,23 @@ public class RestUsuario extends Application {
 
     // Obtener todos los usuarios
     @Path("getall")
-@GET
-@Produces(MediaType.APPLICATION_JSON)
-public Response getAllUsuarios() {
-    String out;
-    try {
-        ControllerUsuario controller = new ControllerUsuario();
-        Gson gson = new Gson();
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAllUsuarios() {
+        String out;
+        try {
+            ControllerUsuario controller = new ControllerUsuario();
+            Gson gson = new Gson();
 
-        out = gson.toJson(controller.getAllUsuarios());
-    } catch (Exception e) {
-        e.printStackTrace();
-        out = String.format("""
+            out = gson.toJson(controller.getAllUsuarios());
+        } catch (Exception e) {
+            e.printStackTrace();
+            out = String.format("""
               {"result":"Error al obtener los usuarios: %s"}
               """, e.getMessage());
+        }
+        return Response.ok(out).build();
     }
-    return Response.ok(out).build();
-}
-
 
     @Path("search")
     @GET
