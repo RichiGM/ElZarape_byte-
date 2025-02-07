@@ -36,6 +36,7 @@ document.getElementById("loginForm").addEventListener("submit", async function (
     try {
         const response = await fetch(`${API_URL}login/validate`, {
             method: "POST",
+             
             headers: {
                 "Content-Type": "application/json"
             },

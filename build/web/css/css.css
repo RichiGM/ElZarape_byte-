@@ -349,8 +349,17 @@ body {
     margin-top: 1rem !important; /* Ajusta la separación */
 }
 #searchInput {
-    margin-bottom: 1rem !important; /* Elimina márgenes innecesarios debajo */
+    border-radius: 5px;
+    border: 2px solid #FAAF08;
+    padding: 10px;
 }
+
+#searchInput:focus {
+    border-color: #FA812F;
+    outline: none;
+    box-shadow: 0 0 10px rgba(250, 129, 47, 0.5);
+}
+
 
 /* Asegurar que la barra de búsqueda no se solape */
 .row > .col:first-child input#searchInput {
@@ -440,5 +449,21 @@ body {
     font-size: 40px; /* Tamaño del ícono más grande */
     margin-right: 15px; /* Espaciado del ícono */
 }
+
+.is-invalid {
+    border-color: red;
+    background-color: #ffe6e6;
+}
+
+.invalid-feedback {
+    color: red;
+    font-size: 0.9em;
+    display: none; /* Oculto por defecto */
+}
+
+.invalid-feedback.visible {
+    display: block; /* Visible si el campo no cumple con la validación */
+}
+
 
 
