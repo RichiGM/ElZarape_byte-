@@ -398,7 +398,7 @@ body {
     background-color: #D13228; /* Rojo más oscuro */
 }
 
-#btnModificar {
+#btnModificar, #btnModificarContrasenia {
     background-color: #FAAF08; /* Amarillo */
     color: #fff;
     border: none;
@@ -406,7 +406,7 @@ body {
     border-radius: 5px;
 }
 
-#btnModificar:hover {
+#btnModificar:hover ,#btnModificarContrasenia:hover{
     background-color: #D89707; /* Amarillo más oscuro */
 }
 
@@ -434,6 +434,7 @@ body {
 .btn-back:hover {
     background-color: #68472E; /* Marrón más oscuro */
 }
+
 
 /* Personalización de las notificaciones Notyf */
 .notyf__toast {
@@ -465,5 +466,63 @@ body {
     display: block; /* Visible si el campo no cumple con la validación */
 }
 
+/* Contenedor centrado */
+.cancel-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}
+/* Botón cancelar más compacto y facherito */
+.btn-cancelar {
+    background-color: #ff4d4d; /* Rojo fuerte */
+    color: white;
+    border: none;
+    padding: 8px 16px; /* Menos padding para hacerlo más chico */
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    box-shadow: 0 2px 6px rgba(255, 77, 77, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
 
+/* Efecto hover */
+.btn-cancelar:hover {
+    background-color: #d32f2f; /* Rojo oscuro */
+    box-shadow: 0 3px 10px rgba(211, 47, 47, 0.5);
+    transform: translateY(-1px);
+}
 
+/* Efecto al presionar */
+.btn-cancelar:active {
+    transform: translateY(1px) scale(0.97);
+    box-shadow: 0 1px 4px rgba(255, 77, 77, 0.3);
+}
+
+/* Ícono dentro del botón */
+.btn-cancelar i {
+    font-size: 16px;
+    color: white;
+}
+
+/* Animación de entrada */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-3px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.btn-cancelar {
+    animation: fadeIn 0.2s ease-out;
+}

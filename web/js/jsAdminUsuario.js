@@ -33,19 +33,25 @@ const notyf = new Notyf({
 const btnModificar = document.getElementById("btnModificar");
 const btnCambiarEstatus = document.getElementById("btnCambiarEstatus");
 const btnAgregar = document.getElementById("btnAgregar");
+const btnCancelarCambioContrasenia = document.getElementById("btnCancelarCambioContrasenia");
+const inputContrasenia = document.getElementById("txtContrasenia");
+const btnTogglePassword = document.getElementById("togglePassword");
+const inputConfirmarContrasenia = document.getElementById("txtConfirmarContrasenia");
+const btnToggleConfirmPassword = document.getElementById("toggleConfirmPassword");
 
 btnModificar.style.display = "none";
 btnCambiarEstatus.style.display = "none";
+btnCancelarCambioContrasenia.style.display = "none";
 
 let usuarios = []; // Lista global de usuarios obtenidos desde la API
 let usuarioSeleccionado = null; // Usuario seleccionado para modificar o cambiar estatus
+let cambioContraseniaActivo = false;
+
 
 document.addEventListener("DOMContentLoaded", () => {
     cargarTabla();
     cargarEstados();
     cargarSucursales();
-
-    document.getElementById("txtTelefono").addEventListener("input", validarTelefono);
 });
 
 // Función para cargar la tabla de usuarios desde la API
@@ -79,7 +85,7 @@ async function cargarTabla() {
         });
 
         document.getElementById("tblUsuarios").innerHTML = cuerpo;
-      
+
     } catch (error) {
         console.error("Error al cargar los datos:", error);
         notyf.error("Hubo un problema al cargar los datos de usuarios. Por favor, intenta nuevamente.");
@@ -88,11 +94,10 @@ async function cargarTabla() {
 
 // Seleccionar un usuario y mostrarlo en el formulario
 async function selectUsuario(index) {
+    limpiar();
     usuarioSeleccionado = usuarios[index];
-    console.log("Usuario seleccionado:", usuarioSeleccionado);
 
     document.getElementById("txtNombreUsuario").value = usuarioSeleccionado.usuario.nombre || "";
-    document.getElementById("txtContrasenia").value = usuarioSeleccionado.usuario.contrasenia || "";
     document.getElementById("txtNombrePersona").value = usuarioSeleccionado.persona.nombre || "";
     document.getElementById("txtApellidosPersona").value = usuarioSeleccionado.persona.apellidos || "";
     document.getElementById("txtTelefono").value = usuarioSeleccionado.persona.telefono || "";
@@ -109,26 +114,28 @@ async function selectUsuario(index) {
             document.getElementById("txtCiudad").value = idCiudad;
         }
     }
-await cargarSucursales();
+
+    await cargarSucursales();
     const tipoEntidad = usuarioSeleccionado.idEmpleado ? "empleado" : "cliente";
     document.getElementById("txtTipoEntidad").value = tipoEntidad;
 
-    const divSucursal = document.getElementById("divSucursal");
     if (tipoEntidad === "empleado") {
-        divSucursal.style.display = "block";
-        await cargarSucursales();
+        document.getElementById("divSucursal").style.display = "block";
         document.getElementById("txtSucursal").value = usuarioSeleccionado.idSucursal || "";
     } else {
-        divSucursal.style.display = "none";
+        document.getElementById("divSucursal").style.display = "none";
     }
 
     btnModificar.style.display = "inline-block";
     btnCambiarEstatus.style.display = "inline-block";
     btnAgregar.style.display = "none";
 
-    limpiarErrores();
-    
+    // Ocultar los campos de contraseña y mostrar solo el botón "Modificar Contraseña"
+    document.getElementById("divModificarContrasenia").style.display = "flex";
+    document.getElementById("divCamposContrasenia").style.display = "none";
+    btnCancelarCambioContrasenia.style.display = "none";
 }
+
 
 // Obtener el estado basado en la ciudad seleccionada
 async function obtenerEstadoPorCiudad(idCiudad) {
@@ -146,13 +153,6 @@ async function obtenerEstadoPorCiudad(idCiudad) {
         notyf.error("No se pudo cargar el estado de la ciudad. Por favor, intenta de nuevo.");
         return null;
     }
-}
-
-// Limpiar errores del formulario
-function limpiarErrores() {
-    const telefonoError = document.getElementById("telefonoError");
-    telefonoError.style.display = "none";
-    document.getElementById("txtTelefono").classList.remove("is-invalid");
 }
 
 // Generar una contraseña aleatoria
@@ -175,73 +175,68 @@ window.generarContrasenia = function () {
 
     contrasenia = contrasenia.split('').sort(() => Math.random() - 0.5).join('');
     document.getElementById("txtContrasenia").value = contrasenia;
+    document.getElementById("txtConfirmarContrasenia").value = contrasenia;
     notyf.success("Contraseña generada correctamente.");
 };
 
 // Mostrar/ocultar contraseña
 window.mostrarOcultarContrasenia = function () {
-    const inputContrasenia = document.getElementById("txtContrasenia");
-    const btnTogglePassword = document.getElementById("togglePassword");
-
     if (inputContrasenia.type === "password") {
         inputContrasenia.type = "text";
         btnTogglePassword.textContent = "Ocultar";
     } else {
         inputContrasenia.type = "password";
         btnTogglePassword.textContent = "Mostrar";
+
     }
 };
 
-
-// Validación de contraseña
-function validarContrasenia(contrasenia) {
-    const tieneLongitud = contrasenia.length >= 12;
-    const tieneMayuscula = /[A-Z]/.test(contrasenia);
-    const tieneEspecial = /[!@#$%^&*()\-_=+\[\]{}|;:,.<>?]/.test(contrasenia);
-
-    return tieneLongitud && tieneMayuscula && tieneEspecial;
-}
-
-// Validación de teléfono
-function validarTelefono() {
-    const telefono = document.getElementById("txtTelefono").value.trim();
-    const telefonoError = document.getElementById("telefonoError");
-
-    if (/^\d{10}$/.test(telefono)) {
-        telefonoError.style.display = "none";
-        document.getElementById("txtTelefono").classList.remove("is-invalid");
-        return true;
+// Mostrar/ocultar confirmación de contraseña
+window.mostrarOcultarConfirmarContrasenia = function () {
+    if (inputConfirmarContrasenia.type === "password") {
+        inputConfirmarContrasenia.type = "text";
+        btnToggleConfirmPassword.textContent = "Ocultar";
     } else {
-        telefonoError.style.display = "block";
-        telefonoError.textContent = "El número debe tener exactamente 10 dígitos.";
-        telefonoError.classList.add("text-danger");
-        document.getElementById("txtTelefono").classList.add("is-invalid");
-        return false;
+        inputConfirmarContrasenia.type = "password";
+        btnToggleConfirmPassword.textContent = "Mostrar";
     }
+};
+
+function habilitarCambioContrasenia() {
+    cambioContraseniaActivo = true;
+
+    document.getElementById("divCamposContrasenia").style.display = "block";
+    document.getElementById("divModificarContrasenia").style.display = "none";
+    btnCancelarCambioContrasenia.style.display = "inline-block";
+
+    document.getElementById("txtContrasenia").removeAttribute("disabled");
+    document.getElementById("txtConfirmarContrasenia").removeAttribute("disabled");
+    document.getElementById("btnGenerarContrasenia").removeAttribute("disabled");
+    document.getElementById("togglePassword").removeAttribute("disabled");
+    document.getElementById("toggleConfirmPassword").removeAttribute("disabled");
+
+    // Limpiar los campos de contraseña antes de comenzar la modificación
+    document.getElementById("txtContrasenia").value = "";
+    document.getElementById("txtConfirmarContrasenia").value = "";
 }
+
+
 
 // Agregar un usuario
 async function agregarUsuario() {
-    if (!validarCamposLlenos()) {
-        notyf.error("Por favor, completa todos los campos antes de agregar un usuario.");
+    if (!validarFormularioSinContrasenia()) {
+        notyf.error("Por favor, completa correctamente todos los campos antes de agregar un usuario.");
         return;
     }
-    if (!validarTelefono()) {
-        notyf.error("El número de teléfono debe contener exactamente 10 dígitos.");
-        return;
-    }
-
-    const contrasenia = document.getElementById("txtContrasenia").value;
-
-    if (!validarContrasenia(contrasenia)) {
-        notyf.error("La contraseña debe tener al menos 12 caracteres, incluir una letra mayúscula y un carácter especial.");
+    if (!validarSoloContrasenia()) {
+        notyf.error("Por favor, completa correctamente todos los campos antes de agregar un usuario.");
         return;
     }
 
     try {
         const data = new URLSearchParams({
             nombreUsuario: document.getElementById("txtNombreUsuario").value,
-            contrasenia: contrasenia,
+            contrasenia: document.getElementById("txtContrasenia").value,
             nombrePersona: document.getElementById("txtNombrePersona").value,
             apellidosPersona: document.getElementById("txtApellidosPersona").value,
             telefono: document.getElementById("txtTelefono").value,
@@ -272,32 +267,26 @@ async function agregarUsuario() {
     }
 }
 
-// Modificar un usuario
+// Modificar usuario (sin modificar contraseña)
 async function modificarUsuario() {
+    if (cambioContraseniaActivo) {
+        if (!validarSoloContrasenia()) {
+            notyf.error("Las contraseñas no cumplen con los requisitos o no coinciden.");
+            return;
+        }
+    }
     if (!usuarioSeleccionado) {
         notyf.error("Debes seleccionar un usuario antes de modificar.");
         return;
     }
-    if (!validarCamposLlenos()) {
+    if (!validarFormularioSinContrasenia()) {
         notyf.error("Por favor, completa todos los campos antes de modificar un usuario.");
-        return;
-    }
-    if (!validarTelefono()) {
-        notyf.error("El número de teléfono debe contener exactamente 10 dígitos.");
-        return;
-    }
-
-    const contrasenia = document.getElementById("txtContrasenia").value;
-
-    if (!validarContrasenia(contrasenia)) {
-        notyf.error("La contraseña debe tener al menos 12 caracteres, incluir una letra mayúscula y un carácter especial.");
         return;
     }
 
     const data = {
         idUsuario: usuarioSeleccionado.usuario.idUsuario || 0,
         nombreUsuario: document.getElementById("txtNombreUsuario").value || "",
-        contrasenia: document.getElementById("txtContrasenia").value || "",
         idPersona: usuarioSeleccionado.persona.idPersona || 0,
         nombrePersona: document.getElementById("txtNombrePersona").value || "",
         apellidosPersona: document.getElementById("txtApellidosPersona").value || "",
@@ -310,7 +299,7 @@ async function modificarUsuario() {
     };
 
     try {
-        const response = await fetch(`${API_URL}usuario/update`, {
+        const response = await fetch(`${API_URL}usuario/updateSinContrasenia`, {
             method: "POST",
             body: JSON.stringify(data),
             headers: {
@@ -319,16 +308,60 @@ async function modificarUsuario() {
         });
 
         const result = await response.json();
-        if (response.ok) {
-            notyf.success("Usuario modificado correctamente.");
-            cargarTabla();
-            limpiar();
-        } else {
+        if (!response.ok) {
             throw new Error(result.result || "Error al modificar usuario.");
         }
+
+        notyf.success("Usuario modificado correctamente.");
+
+        // Si el usuario activó el cambio de contraseña, ejecutar la función
+        if (cambioContraseniaActivo) {
+            modificarContrasenia();
+        }
+
+        cargarTabla();
+        limpiar();
     } catch (error) {
         console.error("Error al modificar usuario:", error);
         notyf.error("Hubo un problema al modificar el usuario. Consulta con el administrador.");
+    }
+}
+
+
+// Modificar solo la contraseña (llamará a la API nueva)
+async function modificarContrasenia() {
+    const nuevaContrasenia = document.getElementById("txtContrasenia").value;
+    const confirmarContrasenia = document.getElementById("txtConfirmarContrasenia").value;
+
+    try {
+        const data = {
+            idUsuario: usuarioSeleccionado.usuario.idUsuario,
+            nuevaContrasenia: nuevaContrasenia
+        };
+
+        const response = await fetch(`${API_URL}usuario/updatePassword`, {
+            method: "POST",
+            body: JSON.stringify(data),
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        const result = await response.json();
+        if (!response.ok) {
+            throw new Error(result.result || "Error al modificar la contraseña.");
+        }
+
+        notyf.success("Contraseña modificada correctamente.");
+
+        // Ocultar nuevamente los campos de contraseña
+        document.getElementById("divCamposContrasenia").style.display = "none";
+        document.getElementById("divModificarContrasenia").style.display = "block";
+
+        cambioContraseniaActivo = false;
+    } catch (error) {
+        console.error("Error al modificar la contraseña:", error);
+        notyf.error("Hubo un problema al modificar la contraseña.");
     }
 }
 
@@ -380,6 +413,7 @@ function mostrarSucursal(tipo) {
 
 // Limpiar el formulario
 function limpiar() {
+    limpiarErrores();
     document.getElementById("usuarioForm").reset();
 
     // Limpiar el campo de selección de ciudad
@@ -393,6 +427,28 @@ function limpiar() {
     btnModificar.style.display = "none";
     btnCambiarEstatus.style.display = "none";
     btnAgregar.style.display = "inline-block";
+    btnCancelarCambioContrasenia.style.display = "none";
+
+
+    document.getElementById("divCamposContrasenia").style.display = "block";
+    document.getElementById("divModificarContrasenia").style.display = "none";
+
+    document.getElementById("txtContrasenia").removeAttribute("disabled");
+    document.getElementById("txtConfirmarContrasenia").removeAttribute("disabled");
+    document.getElementById("btnGenerarContrasenia").removeAttribute("disabled");
+    document.getElementById("togglePassword").removeAttribute("disabled");
+    document.getElementById("toggleConfirmPassword").removeAttribute("disabled");
+
+    // Limpiar los campos de contraseña antes de comenzar la modificación
+    document.getElementById("txtContrasenia").value = "";
+    document.getElementById("txtConfirmarContrasenia").value = "";
+
+    cambioContraseniaActivo = false;
+
+    inputContrasenia.type = "password";
+    btnTogglePassword.textContent = "Mostrar";
+    inputConfirmarContrasenia.type = "password";
+    btnToggleConfirmPassword.textContent = "Mostrar";
 }
 
 
@@ -416,7 +472,7 @@ async function cargarEstados() {
             selectEstado.appendChild(option);
         });
 
-     
+
     } catch (error) {
         console.error("Error al cargar los estados:", error);
         notyf.error("No se pudieron cargar los estados. Consulta con el administrador.");
@@ -451,7 +507,7 @@ window.cargarCiudadesPorEstado = async function cargarCiudadesPorEstado() {
             selectCiudad.appendChild(option);
         });
 
-       
+
     } catch (error) {
         console.error("Error al cargar las ciudades:", error);
         notyf.error("Hubo un problema al cargar las ciudades. Intente nuevamente.");
@@ -479,7 +535,7 @@ async function cargarSucursales() {
             selectSucursal.appendChild(option);
         });
 
-        
+
     } catch (error) {
         console.error("Error al cargar las sucursales:", error);
         notyf.error("No se pudieron cargar las sucursales activas. Consulta con el administrador.");
@@ -495,32 +551,6 @@ function mostrarSucursal(tipo) {
     } else {
         divSucursal.style.display = "none";
     }
-}
-
-// Validar campos llenos
-function validarCamposLlenos() {
-    const getCampo = id => document.getElementById(id) || {value: ""};
-
-    const tipoEntidad = getCampo("txtTipoEntidad").value.trim().toLowerCase();
-    const campos = [
-        getCampo("txtNombreUsuario"),
-        getCampo("txtContrasenia"),
-        getCampo("txtNombrePersona"),
-        getCampo("txtApellidosPersona"),
-        getCampo("txtTelefono"),
-        getCampo("txtCiudad"),
-        getCampo("txtTipoEntidad")
-    ];
-
-    if (tipoEntidad === "empleado") {
-        campos.push(getCampo("txtSucursal"));
-    }
-
-    const camposCompletos = campos.every(campo => campo.value.trim() !== "");
-    if (!camposCompletos) {
-        notyf.error("Por favor, completa todos los campos obligatorios.");
-    }
-    return camposCompletos;
 }
 
 // Filtrar usuarios
@@ -561,7 +591,7 @@ async function filtrarUsuarios() {
         });
 
         document.getElementById("tblUsuarios").innerHTML = cuerpo;
-       
+
     } catch (error) {
         console.error("Error al buscar usuarios:", error);
         notyf.error("Hubo un problema al buscar los usuarios. Intente nuevamente.");
@@ -570,3 +600,278 @@ async function filtrarUsuarios() {
 
 // Vincular el evento de búsqueda
 document.getElementById("searchInput").addEventListener("input", filtrarUsuarios);
+
+function validarFormularioSinContrasenia() {
+    const mensajesCampos = {
+        txtNombreUsuario: "El 'Nombre de Usuario' es obligatorio, debe contener entre 3 y 65 caracteres, permitiendo solo alfanuméricos y guiones bajos, y no se permiten malas palabras.",
+        txtNombrePersona: "El campo 'Nombre' es obligatorio, solo debe contener letras, y no se permiten malas palabras.",
+        txtApellidosPersona: "El campo 'Apellidos' es obligatorio, solo debe contener letras, y no se permiten malas palabras.",
+        txtTelefono: "El 'Teléfono' es obligatorio y debe seguir el formato 477-777-77-77.",
+        txtEstado: "Debe seleccionar un estado.",
+        txtCiudad: "Debe seleccionar una ciudad.",
+        txtTipoEntidad: "Debe seleccionar un tipo de entidad.",
+        txtSucursal: "Debe seleccionar una sucursal si el tipo de entidad es 'empleado'.",
+    };
+
+    let formularioValido = true;
+
+    Object.keys(mensajesCampos).forEach((campoId) => {
+        const elemento = document.getElementById(campoId);
+        const texto = elemento.value.trim();
+        const mensajeError = mensajesCampos[campoId];
+
+        let feedback = elemento.nextElementSibling;
+        if (!feedback || !feedback.classList.contains("invalid-feedback")) {
+            feedback = document.createElement("div");
+            feedback.className = "invalid-feedback";
+            elemento.parentNode.appendChild(feedback);
+        }
+
+        const existingFeedbacks = Array.from(
+                elemento.parentNode.querySelectorAll(".invalid-feedback")
+                );
+        existingFeedbacks.forEach((fb) => {
+            if (fb !== feedback)
+                fb.remove();
+        });
+
+        if (!texto) {
+            if (campoId === "txtSucursal" && document.getElementById("txtTipoEntidad").value === "cliente") {
+                feedback.style.display = "none";
+                elemento.classList.remove("is-invalid");
+                return;
+            }
+
+            elemento.classList.add("is-invalid");
+            feedback.textContent = mensajeError;
+            feedback.style.display = "block";
+            formularioValido = false;
+        } else {
+            let valido = true;
+
+            switch (campoId) {
+                case "txtNombreUsuario":
+                    valido = /^[a-zA-Z0-9_]{3,65}$/.test(texto);
+                    break;
+                case "txtNombrePersona":
+                case "txtApellidosPersona":
+                    valido = /^[A-Za-zÁÉÍÓÚáéíóúÜüÑñ\s]+$/.test(texto);
+                    break;
+                case "txtTelefono":
+                    valido = /^\d{3}-\d{3}-\d{2}-\d{2}$/.test(texto);
+                    break;
+                case "txtEstado":
+                case "txtCiudad":
+                case "txtTipoEntidad":
+                    valido = texto !== "";
+                    break;
+                case "txtSucursal":
+                    if (document.getElementById("txtTipoEntidad").value === "empleado") {
+                        valido = texto !== "";
+                    }
+                    break;
+            }
+
+            if (["txtNombreUsuario", "txtNombrePersona", "txtApellidosPersona"].includes(campoId) &&
+                    contieneMalasPalabras(texto)) {
+                valido = false;
+                feedback.textContent = "El campo contiene lenguaje inapropiado.";
+                feedback.style.display = "block";
+                formularioValido = false;
+            }
+
+            if (!valido) {
+                elemento.classList.add("is-invalid");
+                feedback.textContent = mensajeError;
+                feedback.style.display = "block";
+                formularioValido = false;
+            } else {
+                elemento.classList.remove("is-invalid");
+                feedback.style.display = "none";
+            }
+        }
+    });
+
+    return formularioValido;
+}
+
+function validarSoloContrasenia() {
+    const mensajesCampos = {
+        txtContrasenia: "La 'Contraseña' es obligatoria, debe tener al menos 12 caracteres, incluyendo una mayúscula, un número y un carácter especial.",
+        txtConfirmarContrasenia: "La confirmación de la contraseña es obligatoria y debe coincidir con la contraseña ingresada.",
+    };
+
+    let formularioValido = true;
+
+    Object.keys(mensajesCampos).forEach((campoId) => {
+        const elemento = document.getElementById(campoId);
+        const texto = elemento.value.trim();
+        const mensajeError = mensajesCampos[campoId];
+
+        let feedback = elemento.nextElementSibling;
+        if (!feedback || !feedback.classList.contains("invalid-feedback")) {
+            feedback = document.createElement("div");
+            feedback.className = "invalid-feedback";
+            elemento.parentNode.appendChild(feedback);
+        }
+
+        const existingFeedbacks = Array.from(
+                elemento.parentNode.querySelectorAll(".invalid-feedback")
+                );
+        existingFeedbacks.forEach((fb) => {
+            if (fb !== feedback)
+                fb.remove();
+        });
+
+        if (!texto) {
+            elemento.classList.add("is-invalid");
+            feedback.textContent = mensajeError;
+            feedback.style.display = "block";
+            formularioValido = false;
+        } else {
+            let valido = true;
+
+            switch (campoId) {
+                case "txtContrasenia":
+                    valido = validarContrasenia(texto);
+                    break;
+                case "txtConfirmarContrasenia":
+                    const contrasenia = document.getElementById("txtContrasenia").value;
+                    valido = texto === contrasenia;
+                    if (!valido) {
+                        feedback.textContent = "Las contraseñas no coinciden.";
+                    }
+                    break;
+            }
+
+            if (["txtContrasenia"].includes(campoId) && contieneMalasPalabras(texto)) {
+                valido = false;
+                feedback.textContent = "El campo contiene lenguaje inapropiado.";
+                feedback.style.display = "block";
+                formularioValido = false;
+            }
+
+            if (!valido) {
+                elemento.classList.add("is-invalid");
+                feedback.textContent = mensajeError;
+                feedback.style.display = "block";
+                formularioValido = false;
+            } else {
+                elemento.classList.remove("is-invalid");
+                feedback.style.display = "none";
+            }
+        }
+    });
+
+    return formularioValido;
+}
+
+
+
+function validarContrasenia(contrasenia) {
+    if (!contrasenia.trim()) {
+        return false; // Retorna falso si la contraseña está vacía o solo tiene espacios
+    }
+    const tieneLongitud = contrasenia.length >= 12;
+    const tieneMayuscula = /[A-Z]/.test(contrasenia);
+    const tieneNumero = /[0-9]/.test(contrasenia);
+    const tieneEspecial = /[!@#$%^&*()\-_=+\[\]{}|;:,.<>?]/.test(contrasenia);
+    return tieneLongitud && tieneMayuscula && tieneNumero && tieneEspecial;
+}
+
+document.getElementById("txtConfirmarContrasenia").addEventListener("input", function () {
+    const confirmPassword = this.value;
+    const originalPassword = document.getElementById("txtContrasenia").value;
+    const confirmPasswordError = document.getElementById("confirmPasswordHelp");
+
+    if (confirmPassword !== originalPassword) {
+        confirmPasswordError.style.display = "block";
+        confirmPasswordError.textContent = "Las contraseñas no coinciden.";
+    } else {
+        confirmPasswordError.style.display = "none";
+    }
+});
+
+function contieneMalasPalabras(texto) {
+    const malasPalabras = [
+        "idiota", "imbécil", "estúpido", "tonto", "bobo", "menso", "tarado", "loco",
+        "inútil", "baboso", "gilipollas", "huevón", "fregado", "burro", "torpe",
+        "mierda", "basura", "asco", "pendejo", "cabrón", "puto", "puta", "perra",
+        "zorra", "chingar", "joder", "coño", "carajo", "mamón", "chingada", "chingado",
+        "maldito", "malparido", "ojete", "pelotudo", "culero", "cabrona", "putazo",
+        "chingón", "chingona", "verga", "pinche", "culiao", "mierdero", "gil",
+        "estúpida", "babosa", "burra", "basofia", "desgraciado", "culito",
+        "retrasado", "anormal", "baboso", "hueca", "grosera", "cornudo",
+        "cornuda", "boludo", "malnacido", "corrupto", "estafador", "tramposo",
+        "traidor", "farsante", "malcriado", "pedazo de mierda", "infeliz",
+        "hijo de puta", "cabeza hueca", "patán", "sinvergüenza", "holgazán",
+        "haragán", "gandul", "bribón", "truhan", "bandido", "villano", "idiota",
+        "cretino", "tarúpido", "torombolo", "gordinflón", "cuadrúpedo",
+        "grotesco", "tontín", "babieca", "tarúpido", "canalla", "sin remedio", "chingue su madre",
+        "cabron", "estupido de mierda"
+    ];
+    return malasPalabras.some((palabra) => texto.toLowerCase().includes(palabra));
+}
+
+// Mostrar/ocultar campos de contraseña según la acción
+function toggleCamposContrasenia(mostrar) {
+    const divModificarContrasenia = document.getElementById("divModificarContrasenia");
+    const divCamposContrasenia = document.getElementById("divCamposContrasenia");
+
+    if (mostrar) {
+        divModificarContrasenia.style.display = "none"; // Ocultar el botón de modificar contraseña
+        divCamposContrasenia.style.display = "block"; // Mostrar campos de contraseña
+        document.getElementById("txtContrasenia").removeAttribute("disabled");
+        document.getElementById("txtConfirmarContrasenia").removeAttribute("disabled");
+        document.getElementById("btnGenerarContrasenia").removeAttribute("disabled");
+        document.getElementById("togglePassword").removeAttribute("disabled");
+        document.getElementById("toggleConfirmPassword").removeAttribute("disabled");
+    } else {
+        divModificarContrasenia.style.display = "block"; // Mostrar el botón de modificar contraseña
+        divCamposContrasenia.style.display = "none"; // Ocultar los campos de contraseña
+        document.getElementById("txtContrasenia").setAttribute("disabled", true);
+        document.getElementById("txtConfirmarContrasenia").setAttribute("disabled", true);
+        document.getElementById("btnGenerarContrasenia").setAttribute("disabled", true);
+        document.getElementById("togglePassword").setAttribute("disabled", true);
+        document.getElementById("toggleConfirmPassword").setAttribute("disabled", true);
+    }
+}
+
+function cancelarCambioContrasenia() {
+    cambioContraseniaActivo = false;
+
+    document.getElementById("divCamposContrasenia").style.display = "none";
+    document.getElementById("divModificarContrasenia").style.display = "flex";
+    btnCancelarCambioContrasenia.style.display = "none";
+
+    // Limpiar y deshabilitar los campos de contraseña
+    document.getElementById("txtContrasenia").value = "";
+    document.getElementById("txtConfirmarContrasenia").value = "";
+    document.getElementById("txtContrasenia").setAttribute("disabled", true);
+    document.getElementById("txtConfirmarContrasenia").setAttribute("disabled", true);
+    document.getElementById("btnGenerarContrasenia").setAttribute("disabled", true);
+    document.getElementById("togglePassword").setAttribute("disabled", true);
+    document.getElementById("toggleConfirmPassword").setAttribute("disabled", true);
+
+    inputContrasenia.type = "password";
+    btnTogglePassword.textContent = "Mostrar";
+    inputConfirmarContrasenia.type = "password";
+    btnToggleConfirmPassword.textContent = "Mostrar";
+}
+
+function limpiarErrores() {
+    // Obtener todos los elementos con la clase 'is-invalid' y eliminarla
+    document.querySelectorAll(".is-invalid").forEach((elemento) => {
+        elemento.classList.remove("is-invalid");
+    });
+
+    // Ocultar todos los mensajes de error
+    document.querySelectorAll(".invalid-feedback").forEach((feedback) => {
+        feedback.style.display = "none";
+    });
+
+    // Limpiar cualquier contenido en los mensajes de error
+    document.querySelectorAll(".invalid-feedback").forEach((feedback) => {
+        feedback.textContent = "";
+    });
+}
