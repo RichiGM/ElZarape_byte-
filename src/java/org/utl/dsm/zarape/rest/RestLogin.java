@@ -8,6 +8,7 @@ import com.google.gson.JsonObject;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.utl.dsm.zarape.controller.ControllerUsuario;
 import org.utl.dsm.zarape.model.LoginRequest;
+import org.apache.commons.codec.digest.DigestUtils;
 
 @Path("login")
 public class RestLogin {
