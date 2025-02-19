@@ -1,31 +1,35 @@
 let bebidas = [];
 
 // Cargar bebidas desde la API y actualizar la tabla
-function cargarBebidas() {
+async function cargarBebidas() {
     const ruta = `${API_URL}bebidas/getall`;
 
-    fetch(ruta)
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error(`Error al cargar las bebidas: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then((data) => {
-                console.log("Bebidas cargadas:", data); // Debugging
-                if (Array.isArray(data)) {
-                    bebidas = data;
-                    actualizarTablaBebidas(bebidas);
-                    
-                } else {
-                    console.error("Error: Formato de datos incorrecto", data);
-                    
-                }
-            })
-            .catch((error) => {
-                console.error("Error al cargar las bebidas:", error);
-               
-            });
+    try {
+        const response = await fetch(ruta, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": localStorage.getItem("lastToken") // Enviar el token
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error al cargar las bebidas: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("Bebidas cargadas:", data); // Debugging
+        if (Array.isArray(data)) {
+            bebidas = data;
+            actualizarTablaBebidas(bebidas);
+        } else {
+            console.error("Error: Formato de datos incorrecto", data);
+            notyf.error("El servidor devolvió un formato de datos incorrecto.");
+        }
+    } catch (error) {
+        console.error("Error al cargar las bebidas:", error);
+        notyf.error("No se pudieron cargar las bebidas. Consulte con el administrador.");
+    }
 }
 
 // Actualizar la tabla de bebidas con los datos cargados
@@ -41,7 +45,6 @@ function actualizarTablaBebidas(bebidasParaMostrar) {
     // Asegúrate de que bebidasParaMostrar sea un array
     if (Array.isArray(bebidasParaMostrar)) {
         bebidasParaMostrar.forEach((bebida, index) => {
-            // Comprobar que bebida tenga las propiedades necesarias
             const producto = bebida.producto || bebida; // Usar bebida.producto si existe
             if (producto) {
                 const row = tabla.insertRow();
@@ -70,7 +73,7 @@ function actualizarTablaBebidas(bebidasParaMostrar) {
 }
 
 // Función para realizar búsqueda dinámica en la tabla
-function filtrarBebidas() {
+async function filtrarBebidas() {
     const textoBusqueda = document.getElementById("searchInput").value.trim();
 
     // Si no hay texto de búsqueda, cargar todas las bebidas
@@ -82,30 +85,33 @@ function filtrarBebidas() {
     // Construir la ruta para la API
     const ruta = `${API_URL}bebidas/search/${encodeURIComponent(textoBusqueda)}`;
     
-    fetch(ruta)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`Error en la solicitud: ${response.statusText}`);
+    try {
+        const response = await fetch(ruta, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": localStorage.getItem("lastToken") // Enviar el token
             }
-            return response.json();
-        })
-        .then(data => {
-            console.log("Resultados de la búsqueda:", data);
-
-            if (Array.isArray(data) && data.length > 0) {
-                actualizarTablaBebidas(data); // Actualizar la tabla con los resultados
-            } else {
-               
-                actualizarTablaBebidas([]); // Limpiar la tabla si no hay resultados
-            }
-        })
-        .catch(error => {
-            console.error("Error al buscar bebidas:", error);
-            
         });
+
+        if (!response.ok) {
+            throw new Error(`Error en la solicitud: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        console.log("Resultados de la búsqueda:", data);
+
+        if (Array.isArray(data) && data.length > 0) {
+            actualizarTablaBebidas(data); // Actualizar la tabla con los resultados
+        } else {
+            notyf.error("No se encontraron resultados.");
+            actualizarTablaBebidas([]); // Limpiar la tabla si no hay resultados
+        }
+    } catch (error) {
+        console.error("Error al buscar bebidas:", error);
+        notyf .error("Hubo un problema al realizar la búsqueda.");
+    }
 }
-
-
 
 // Cargar las bebidas al cargar la página
 document.addEventListener("DOMContentLoaded", cargarBebidas);

@@ -1,14 +1,15 @@
+
 const notyf = new Notyf({
-    duration: 7000, // Duración en milisegundos
+    duration: 7000,
     position: {
-        x: 'left', // Esquina derecha
-        y: 'top'    // Parte superior
+        x: 'left',
+        y: 'top'
     },
-    ripple: true, // Animación de onda
+    ripple: true,
     types: [
         {
             type: 'success',
-            background: '#28a745', // Verde para éxito
+            background: '#28a745',
             icon: {
                 className: 'fas fa-check-circle',
                 tagName: 'i',
@@ -17,7 +18,7 @@ const notyf = new Notyf({
         },
         {
             type: 'error',
-            background: '#dc3545', // Rojo para errores
+            background: '#dc3545',
             icon: {
                 className: 'fas fa-times-circle',
                 tagName: 'i',
@@ -36,7 +37,6 @@ document.getElementById("loginForm").addEventListener("submit", async function (
     try {
         const response = await fetch(`${API_URL}login/validate`, {
             method: "POST",
-             
             headers: {
                 "Content-Type": "application/json"
             },
@@ -46,10 +46,32 @@ document.getElementById("loginForm").addEventListener("submit", async function (
         if (response.ok) {
             const result = await response.json();
             if (result.success) {
-                notyf.success('¡Inicio de sesión exitoso! Redirigiendo al menú principal...');
+                // Obtener el lastToken
+                const tokenResponse = await fetch(`${API_URL}usuario/cheecky?nombre=${username}`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                });
+
+                if (tokenResponse.ok) {
+                    const tokenResult = await tokenResponse.json();
+                    if (tokenResult.token) {
+                        console.log("Token asignado:", tokenResult.token);
+                        // Guardar en localStorage
+                        localStorage.setItem("username", username);
+                        localStorage.setItem("lastToken", tokenResult.token);
+                    } else {
+                        notyf.error('No se pudo asignar el token.');
+                    }
+                } else {
+                    notyf.error('Error al obtener el token.');
+                }
+
+                notyf.success(`¡Inicio de sesión exitoso! Bienvenido, ${username}. Redirigiendo al menú principal...`);
                 setTimeout(() => {
                     window.location.href = "menu.html";
-                }, 1000); // Redirige después de 2 segundos
+                }, 1000);
             } else {
                 notyf.error('Credenciales incorrectas. Por favor, verifica tu nombre de usuario y contraseña.');
             }

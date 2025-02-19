@@ -57,7 +57,7 @@ public class RestUsuario extends Application {
     }
 
     // Modificar Usuario
-    // Modificar Usuario (sin modificar contraseña)
+   
     @Path("updateSinContrasenia")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
@@ -205,4 +205,51 @@ public class RestUsuario extends Application {
         return Response.ok(out).build();
     }
 
+    @Path("cheecky")
+    @Produces(MediaType.APPLICATION_JSON)
+    @GET
+    public Response checkingUser(@QueryParam("nombre") @DefaultValue("") String nombre) {
+        String out = null;
+        String result = null;
+        ControllerUsuario controller = new ControllerUsuario();
+
+        try {
+            result = controller.checkUsers(nombre);
+            JsonObject jsonResponse = new JsonObject();
+            if (result == null || result.isEmpty()) {
+                jsonResponse.addProperty("error", "No se encontró un token");
+            } else {
+                jsonResponse.addProperty("token", result);
+            }
+
+            out = new Gson().toJson(jsonResponse);
+        } catch (Exception e) {
+            JsonObject errorResponse = new JsonObject();
+            errorResponse.addProperty("error", "Por ahi no joven");
+            out = errorResponse.toString();
+            System.out.println(e.getMessage());
+        }
+
+        return Response.status(Response.Status.OK).entity(out).build();
+    }
+
+    @Path("logout")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response logoutUsuario(@FormParam("nombreUsuario") @DefaultValue("") String nombreUsuario) {
+        String out;
+        ControllerUsuario controller = new ControllerUsuario();
+        try {
+            controller.logoutUser(nombreUsuario);
+            out = """
+              {"result":"Logout exitoso, lastToken establecido a null"}
+              """;
+        } catch (Exception e) {
+            e.printStackTrace();
+            out = """
+              {"result":"Error al hacer logout"}
+              """;
+        }
+        return Response.ok(out).build();
+    }
 }

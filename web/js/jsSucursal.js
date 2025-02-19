@@ -1,10 +1,56 @@
-// Obtener las sucursales desde la API y cargarlas en la tabla
+// Función para verificar si hay una sesión activa
+function checkSession() {
+    const lastToken = localStorage.getItem("lastToken");
+    if (!lastToken) {
+        console.warn("Acceso denegado: usuario no autenticado.");
+        
+        // Limpiar la pantalla antes de redirigir
+        document.body.innerHTML = "";
 
+        // Redirigir a la página de acceso denegado
+        window.location.href = "acceso_denegado.html";
+
+        // Detener la ejecución de cualquier otro código
+        return;
+    }
+}
+
+// Función para cargar componentes asíncronamente
+async function loadComponent(id, file) {
+    try {
+        const element = document.getElementById(id);
+        const response = await fetch(file);
+        if (!response.ok) {
+            throw new Error(`Error al cargar ${file}: ${response.status}`);
+        }
+        const html = await response.text();
+        element.innerHTML = html;
+
+        // Verificar si es el header y ejecutar la lógica del usuario
+        if (id === "header") {
+            updateUserInfo();
+        }
+    } catch (error) {
+        console.error("Error al cargar el componente:", error);
+    }
+}
+
+// Obtener las sucursales desde la API y cargarlas en la tabla
 function cargarSucursales() {
     const ruta = `${API_URL}sucursal/getall`;
+    const lastToken = localStorage.getItem("lastToken"); // Obtener el token
+    console.log("Token actual:", lastToken); // Verificar el token
+    console.log("URL de la API:", ruta); // Verificar la URL
 
-    fetch(ruta)
+    fetch(ruta, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json", // Sin espacio
+            "Authorization": lastToken // Enviar el token
+        }
+    })
         .then(response => {
+            console.log("Respuesta de la API:", response); // Verificar la respuesta
             if (!response.ok) {
                 throw new Error(`Error al obtener las sucursales: ${response.status}`);
             }
@@ -24,7 +70,6 @@ function cargarSucursales() {
         })
         .catch(error => {
             console.error("Error al cargar las sucursales:", error);
-            alert("No se pudieron cargar las sucursales. Consulte con el administrador.");
         });
 }
 
@@ -34,7 +79,7 @@ function actualizarTabla(data) {
     tblSucursales.innerHTML = ""; // Limpiar la tabla antes de llenarla
 
     data.forEach((sucursal) => {
-        console.log(`Sucursal: ${sucursal.nombre}, Activo: ${sucursal.sucursalActivo}`); // Depuración
+        console.log(`Sucursal: ${sucursal.nombre}, Activo: ${sucursal.sucursalActivo}`);
 
         const direccion = `
             ${(sucursal.estado && sucursal.estado.nombre) || "N/A"}, 
@@ -42,7 +87,6 @@ function actualizarTabla(data) {
             ${sucursal.calle || "N/A"} ${sucursal.numCalle || "N/A"}, 
             ${sucursal.colonia || "N/A"}`.trim();
 
-        // Crear la fila de la tabla
         const fila = document.createElement("tr");
 
         fila.innerHTML = `
@@ -54,19 +98,16 @@ function actualizarTabla(data) {
             <td>${sucursal.sucursalActivo === 1 ? "Activo" : "Inactivo"}</td>
         `;
 
-        // Asignar evento de selección a la fila
         fila.addEventListener("click", () => seleccionarSucursal(sucursal));
-
-        tblSucursales.appendChild(fila); // Agregar la fila a la tabla
+        tblSucursales.appendChild(fila);
     });
 }
-
 
 // Búsqueda dinámica de sucursales desde el backend
 function buscarSucursales() {
     const filtro = document.getElementById("searchInput").value.trim();
+    const lastToken = localStorage.getItem("lastToken"); // Obtener el token
 
-    // Si el campo está vacío, carga todas las sucursales
     if (!filtro) {
         cargarSucursales();
         return;
@@ -74,38 +115,35 @@ function buscarSucursales() {
 
     const ruta = `${API_URL}sucursal/search/${filtro}`;
 
-    fetch(ruta)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Error al realizar la búsqueda: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log("Resultados de búsqueda desde la API:", data);
-                if (Array.isArray(data)) {
-                    actualizarTabla(data); // Actualiza la tabla con los resultados filtrados
-                } else {
-                    alert("No se encontraron resultados.");
-                }
-            })
-            .catch(error => {
-                console.error("Error en la búsqueda dinámica:", error);
-                alert("Error al realizar la búsqueda. Consulte con el administrador.");
-            });
+    fetch(ruta, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json", // Sin espacio
+            "Authorization": lastToken // Enviar el token
+        }
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Error al realizar la búsqueda: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("Resultados de búsqueda desde la API:", data);
+            if (Array.isArray(data)) {
+                actualizarTabla(data);
+            } else {
+                alert("No se encontraron resultados.");
+            }
+        })
+        .catch(error => {
+            console.error("Error en la búsqueda dinámica:", error);
+        });
 }
 
-// Modifica el evento del campo de búsqueda
+// Evento para búsqueda dinámica
 document.getElementById("searchInput").addEventListener("input", buscarSucursales);
-
-
-// Normalizar texto para búsquedas (elimina acentos y pasa a minúsculas)
-function normalizarTexto(texto) {
-    return texto
-            .toLowerCase()
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "");
-}
-
-// Llamar a cargar las sucursales al cargar la página
-document.addEventListener("DOMContentLoaded", cargarSucursales);
+window.onload = function() {
+    checkSession();
+    cargarSucursales(); // Llama a cargarSucursales después de verificar la sesión
+};

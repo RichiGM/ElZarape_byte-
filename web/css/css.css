@@ -526,3 +526,17 @@ body {
 .btn-cancelar {
     animation: fadeIn 0.2s ease-out;
 }
+
+.user-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 8px;
+}
+
+.username-text {
+    font-size: 16px;
+    font-weight: bold;
+    color: black;
+}

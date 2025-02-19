@@ -47,34 +47,38 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // Función para cargar las bebidas desde el backend
-function cargarBebidas() {
+async function cargarBebidas() {
     const ruta = `${API_URL}bebidas/getall`;
 
-    fetch(ruta)
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error(`Error al cargar las bebidas: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then((data) => {
-                console.log("Bebidas cargadas:", data); // Debugging
-                if (Array.isArray(data)) {
-                    bebidas = data;
-                    actualizarTablaBebidas(bebidas);
-                    
-                } else {
-                    console.error("Error: Formato de datos incorrecto", data);
-                    notyf.error("El servidor devolvió un formato de datos incorrecto.");
-                }
-            })
-            .catch((error) => {
-                console.error("Error al cargar las bebidas:", error);
-                notyf.error("No se pudieron cargar las bebidas. Consulte con el administrador.");
-            });
+    try {
+        const response = await fetch(ruta, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": localStorage.getItem("lastToken") // Enviar el token
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error al cargar las bebidas: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("Bebidas cargadas:", data); // Debugging
+        if (Array.isArray(data)) {
+            bebidas = data;
+            actualizarTablaBebidas(bebidas);
+        } else {
+            console.error("Error: Formato de datos incorrecto", data);
+            notyf.error("El servidor devolvió un formato de datos incorrecto.");
+        }
+    } catch (error) {
+        console.error("Error al cargar las bebidas:", error);
+        notyf.error("No se pudieron cargar las bebidas. Consulte con el administrador.");
+    }
 }
 
-function agregarBebida() {
+async function agregarBebida() {
     // Validar campos y precio
     if (!validarCampos() || !validarPrecio()) {
         return;
@@ -93,64 +97,70 @@ function agregarBebida() {
             descripcion: descripcion,
             precio: precio,
             foto: foto,
-            categoria: {idCategoria: idCategoria},
+            categoria: { idCategoria: idCategoria },
         },
     };
 
-    fetch(`${API_URL}bebidas/insert`, {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(bebida),
-    })
-            .then((response) => {
-                if (!response.ok)
-                    throw new Error("Error al agregar la bebida.");
-                return response.json();
-            })
-            .then((data) => {
-                console.log("Respuesta al agregar bebida:", data); // Debugging
-                notyf.success("Bebida agregada correctamente.");
-                cargarBebidas(); // Refrescar la lista de bebidas
-                limpiar(); // Limpiar el formulario
-            })
-            .catch((error) => {
-                console.error("Error al agregar bebida:", error);
-                notyf.error("Hubo un problema al agregar la bebida. Consulta con el administrador.");
-            });
+    try {
+        const response = await fetch(`${API_URL}bebidas/insert`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": localStorage.getItem("lastToken") // Enviar el token
+            },
+            body: JSON.stringify(bebida),
+        });
+
+        if (response.ok) {
+            notyf.success("Bebida agregada correctamente.");
+            cargarBebidas(); // Refrescar la lista de bebidas
+            limpiar(); // Limpiar el formulario
+        } else {
+            throw new Error("Error al agregar la bebida.");
+        }
+    } catch (error) {
+        console.error("Error al agregar bebida:", error);
+        notyf.error("Hubo un problema al agregar la bebida. Consulta con el administrador.");
+    }
 }
 
 // Función para cargar categorías de tipo "bebida"
-function cargarCategorias() {
+async function cargarCategorias() {
     const ruta = `${API_URL}categoria/getall/bebidas`;
 
-    fetch(ruta)
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error(`Error al cargar las categorías: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then((categorias) => {
-                console.log("Categorías cargadas:", categorias); // Debugging
-                const select = document.getElementById("txtCategoria");
-                select.innerHTML = '<option value="" disabled selected>Seleccione una categoría</option>';
+    try {
+        const response = await fetch(ruta, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": localStorage.getItem("lastToken") // Enviar el token
+            }
+        });
 
-                categorias.forEach((categoria) => {
-                    if (categoria.activo === 1) { // Solo categorías activas
-                        const option = document.createElement("option");
-                        option.value = categoria.idCategoria;
-                        option.textContent = categoria.descripcion;
-                        select.appendChild(option);
-                    }
-                });
-            })
-            .catch((error) => {
-                console.error("Error al cargar las categorías:", error);
-                notyf.error("No se pudieron cargar las categorías. Consulte con el administrador.");
-            });
+        if (!response.ok) {
+            throw new Error(`Error al cargar las categorías: ${response.status}`);
+        }
+
+        const categorias = await response.json();
+        console.log("Categorías cargadas:", categorias); // Debugging
+        const select = document.getElementById("txtCategoria");
+        select.innerHTML = '<option value="" disabled selected>Seleccione una categoría</option>';
+
+        categorias.forEach((categoria) => {
+            if (categoria.activo === 1) { // Solo categorías activas
+                const option = document.createElement("option");
+                option.value = categoria.idCategoria;
+                option.textContent = categoria.descripcion;
+                select.appendChild(option);
+            }
+        });
+    } catch (error) {
+        console.error("Error al cargar las categorías:", error);
+        notyf.error("No se pudieron cargar las categorías. Consulte con el administrador.");
+    }
 }
 
-function modificarBebida() {
+async function modificarBebida() {
     if (!validarCampos() || !validarPrecio()) {
         return;
     }
@@ -172,22 +182,27 @@ function modificarBebida() {
         },
     };
 
-    fetch(`${API_URL}bebidas/update`, {
-        method: "PUT",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(bebida),
-    })
-            .then((response) => {
-                if (!response.ok)
-                    throw new Error("Error al modificar la bebida.");
-                notyf.success("Bebida modificada correctamente.");
-                cargarBebidas();
-                limpiar();
-            })
-            .catch((error) => {
-                console.error("Error al modificar bebida:", error);
-                notyf.error("Hubo un problema al modificar la bebida.");
-            });
+    try {
+        const response = await fetch(`${API_URL}bebidas/update`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": localStorage.getItem("lastToken") // Enviar el token
+            },
+            body: JSON.stringify(bebida),
+        });
+
+        if (!response.ok) {
+            throw new Error("Error al modificar la bebida.");
+        }
+
+        notyf.success("Bebida modificada correctamente.");
+        cargarBebidas();
+        limpiar();
+    } catch (error) {
+        console.error("Error al modificar bebida:", error);
+        notyf.error("Hubo un problema al modificar la bebida.");
+    }
 }
 
 // Función para actualizar la tabla con las bebidas cargadas
@@ -283,7 +298,7 @@ function limpiar() {
     filas.forEach(f => f.classList.remove("selected"));
 }
 
-function cambiarEstatus() {
+async function cambiarEstatus() {
     if (!bebidaSeleccionada) {
         notyf.error("Por favor selecciona una bebida para cambiar su estatus.");
         return;
@@ -291,23 +306,29 @@ function cambiarEstatus() {
 
     const idProducto = bebidaSeleccionada.producto.idProducto;
 
-    fetch(`${API_URL}bebidas/cambiarEstatus/${idProducto}`, {
-        method: "PUT",
-    })
-            .then((response) => {
-                if (!response.ok)
-                    throw new Error("Error al cambiar el estatus de la bebida.");
-                notyf.success("Estatus cambiado correctamente.");
-                cargarBebidas(); // Recargar todas las bebidas
-                limpiar(); // Limpiar el formulario
-            })
-            .catch((error) => {
-                console.error("Error al cambiar el estatus:", error);
-                notyf.error("Hubo un problema al cambiar el estatus de la bebida.");
-            });
+    try {
+        const response = await fetch(`${API_URL}bebidas/cambiarEstatus/${idProducto}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": localStorage.getItem("lastToken") // Enviar el token
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error("Error al cambiar el estatus de la bebida.");
+        }
+
+        notyf.success("Estatus cambiado correctamente.");
+        cargarBebidas(); // Recargar todas las bebidas
+        limpiar(); // Limpiar el formulario
+    } catch (error) {
+        console.error("Error al cambiar el estatus:", error);
+        notyf.error("Hubo un problema al cambiar el estatus de la bebida.");
+    }
 }
 
-function filtrarBebidas() {
+async function filtrarBebidas() {
     const textoBusqueda = document.getElementById("searchInput").value.trim();
 
     // Si no hay texto de búsqueda, cargar todas las bebidas
@@ -319,27 +340,32 @@ function filtrarBebidas() {
     // Construir la ruta para la API
     const ruta = `${API_URL}bebidas/search/${encodeURIComponent(textoBusqueda)}`;
     
-    fetch(ruta)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`Error en la solicitud: ${response.statusText}`);
+    try {
+        const response = await fetch(ruta, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": localStorage.getItem("lastToken") // Enviar el token
             }
-            return response.json();
-        })
-        .then(data => {
-            console.log("Resultados de la búsqueda:", data);
-
-            if (Array.isArray(data) && data.length > 0) {
-                actualizarTablaBebidas(data); // Actualizar la tabla con los resultados
-            } else {
-                notyf.error("No se encontraron resultados.");
-                actualizarTablaBebidas([]); // Limpiar la tabla si no hay resultados
-            }
-        })
-        .catch(error => {
-            console.error("Error al buscar bebidas:", error);
-            notyf.error("Error al realizar la búsqueda. Consulte con el administrador.");
         });
+
+        if (!response.ok) {
+            throw new Error(`Error en la solicitud: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        console.log("Resultados de la búsqueda:", data);
+
+        if (Array.isArray(data) && data.length > 0) {
+            actualizarTablaBebidas(data); // Actualizar la tabla con los resultados
+        } else {
+            notyf.error("No se encontraron resultados.");
+            actualizarTablaBebidas([]); // Limpiar la tabla si no hay resultados
+        }
+    } catch (error) {
+        console.error("Error al buscar bebidas:", error);
+        notyf.error("Error al realizar la búsqueda. Consulte con el administrador.");
+    }
 }
 
 // Función para convertir una imagen a Base64

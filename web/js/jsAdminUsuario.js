@@ -57,7 +57,14 @@ document.addEventListener("DOMContentLoaded", () => {
 // Función para cargar la tabla de usuarios desde la API
 async function cargarTabla() {
     try {
-        const response = await fetch(`${API_URL}usuario/getall`);
+        const response = await fetch(`${API_URL}usuario/getall`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": localStorage.getItem("lastToken") // Enviar el token
+            }
+        });
+
         if (!response.ok) {
             throw new Error(`Error al obtener los usuarios: ${response.status}`);
         }
@@ -140,7 +147,14 @@ async function selectUsuario(index) {
 // Obtener el estado basado en la ciudad seleccionada
 async function obtenerEstadoPorCiudad(idCiudad) {
     try {
-        const response = await fetch(`${API_URL}ciudad/getall`);
+        const response = await fetch(`${API_URL}ciudad/getall`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": localStorage.getItem("lastToken") // Enviar el token
+            }
+        });
+
         if (!response.ok) {
             throw new Error(`Error al obtener las ciudades: ${response.status}`);
         }
@@ -249,6 +263,7 @@ async function agregarUsuario() {
             method: "POST",
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
+                "Authorization": localStorage.getItem("lastToken") // Enviar el token
             },
             body: data,
         });
@@ -304,6 +319,7 @@ async function modificarUsuario() {
             body: JSON.stringify(data),
             headers: {
                 "Content-Type": "application/json",
+                "Authorization": localStorage.getItem("lastToken") // Enviar el token
             },
         });
 
@@ -333,6 +349,12 @@ async function modificarContrasenia() {
     const nuevaContrasenia = document.getElementById("txtContrasenia").value;
     const confirmarContrasenia = document.getElementById("txtConfirmarContrasenia").value;
 
+    // Verificar que las contraseñas coincidan
+    if (nuevaContrasenia !== confirmarContrasenia) {
+        notyf.error("Las contraseñas no coinciden.");
+        return;
+    }
+
     try {
         const data = {
             idUsuario: usuarioSeleccionado.usuario.idUsuario,
@@ -344,6 +366,7 @@ async function modificarContrasenia() {
             body: JSON.stringify(data),
             headers: {
                 "Content-Type": "application/json",
+                "Authorization": localStorage.getItem("lastToken") // Enviar el token
             },
         });
 
@@ -375,7 +398,8 @@ async function cambiarEstatus() {
         const response = await fetch(`${API_URL}usuario/cambiarEstatus`, {
             method: "POST",
             headers: {
-                "Content-Type": "application/x-www-form-urlencoded"
+                "Content-Type": "application/x-www-form-urlencoded",
+                "Authorization": localStorage.getItem("lastToken") // Enviar el token
             },
             body: data
         });
@@ -456,7 +480,14 @@ function limpiar() {
 // Cargar estados
 async function cargarEstados() {
     try {
-        const response = await fetch(`${API_URL}estado/getall`);
+        const response = await fetch(`${API_URL}estado/getall`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": localStorage.getItem("lastToken") // Enviar el token
+            }
+        });
+
         if (!response.ok) {
             throw new Error(`Error al obtener los estados: ${response.status}`);
         }
@@ -471,7 +502,6 @@ async function cargarEstados() {
             option.textContent = estado.nombre;
             selectEstado.appendChild(option);
         });
-
 
     } catch (error) {
         console.error("Error al cargar los estados:", error);
@@ -491,7 +521,14 @@ window.cargarCiudadesPorEstado = async function cargarCiudadesPorEstado() {
     }
 
     try {
-        const response = await fetch(`${API_URL}ciudad/getbyestado?idEstado=${idEstado}`);
+        const response = await fetch(`${API_URL}ciudad/getbyestado?idEstado=${idEstado}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": localStorage.getItem("lastToken") // Enviar el token
+            }
+        });
+
         if (!response.ok) {
             throw new Error(`Error al obtener las ciudades: ${response.status}`);
         }
@@ -507,7 +544,6 @@ window.cargarCiudadesPorEstado = async function cargarCiudadesPorEstado() {
             selectCiudad.appendChild(option);
         });
 
-
     } catch (error) {
         console.error("Error al cargar las ciudades:", error);
         notyf.error("Hubo un problema al cargar las ciudades. Intente nuevamente.");
@@ -517,7 +553,14 @@ window.cargarCiudadesPorEstado = async function cargarCiudadesPorEstado() {
 // Cargar sucursales
 async function cargarSucursales() {
     try {
-        const response = await fetch(`${API_URL}sucursal/getall`);
+        const response = await fetch(`${API_URL}sucursal/getall`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": localStorage.getItem("lastToken") // Enviar el token
+            }
+        });
+
         if (!response.ok) {
             throw new Error(`Error al obtener las sucursales: ${response.status}`);
         }
@@ -534,7 +577,6 @@ async function cargarSucursales() {
             option.textContent = `${sucursal.nombre} (${sucursal.ciudad.nombre})`;
             selectSucursal.appendChild(option);
         });
-
 
     } catch (error) {
         console.error("Error al cargar las sucursales:", error);
@@ -563,7 +605,14 @@ async function filtrarUsuarios() {
     }
 
     try {
-        const response = await fetch(`${API_URL}usuario/search?nombreUsuario=${encodeURIComponent(searchInput)}`);
+        const response = await fetch(`${API_URL}usuario/search?nombreUsuario=${encodeURIComponent(searchInput)}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": localStorage.getItem("lastToken") // Enviar el token
+            }
+        });
+
         if (!response.ok) {
             throw new Error(`Error al buscar usuarios: ${response.status}`);
         }

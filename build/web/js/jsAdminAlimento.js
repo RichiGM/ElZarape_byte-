@@ -29,6 +29,7 @@ const notyf = new Notyf({
         }
     ]
 });
+
 // Botones de acción
 const btnModificar = document.getElementById("btnModificar");
 const btnCambiarEstatus = document.getElementById("btnCambiarEstatus");
@@ -81,7 +82,13 @@ function validarPrecio() {
 // Cargar las categorías de tipo "alimento"
 async function cargarCategorias() {
     try {
-        const response = await fetch(`${API_URL}categoria/getall`);
+        const response = await fetch(`${API_URL}categoria/getall`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": localStorage.getItem("lastToken") // Enviar el token
+            }
+        });
         if (!response.ok) {
             throw new Error(`Error al cargar las categorías: ${response.status}`);
         }
@@ -105,31 +112,35 @@ async function cargarCategorias() {
 }
 
 // Cargar la tabla de alimentos
-function cargarAlimentos() {
+async function cargarAlimentos() {
     const ruta = `${API_URL}alimento/getall`;
 
-    fetch(ruta)
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error(`Error al cargar los alimentos: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then((data) => {
-                console.log("Alimentos cargados:", data); // Debugging
-                if (Array.isArray(data)) {
-                    alimentos = data;
-                    actualizarTablaAlimentos(alimentos);
-                    
-                } else {
-                    console.error("Error: Formato de datos incorrecto", data);
-                    notyf.error("El servidor devolvió un formato de datos incorrecto.");
-                }
-            })
-            .catch((error) => {
-                console.error("Error al cargar las bebidas:", error);
-                notyf.error("No se pudieron cargar los alimentos. Consulte con el administrador.");
-            });
+    try {
+        const response = await fetch(ruta, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": localStorage.getItem("lastToken") // Enviar el token
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error al cargar los alimentos: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("Alimentos cargados:", data); // Debugging
+        if (Array.isArray(data)) {
+            alimentos = data;
+            actualizarTablaAlimentos(alimentos);
+        } else {
+            console.error("Error: Formato de datos incorrecto ", data);
+            notyf.error("El servidor devolvió un formato de datos incorrecto.");
+        }
+    } catch (error) {
+        console.error("Error al cargar los alimentos:", error);
+        notyf.error("No se pudieron cargar los alimentos. Consulte con el administrador.");
+    }
 }
 
 // Actualizar la tabla con los alimentos cargados
@@ -142,15 +153,12 @@ function actualizarTablaAlimentos(alimentosParaMostrar) {
 
     tabla.innerHTML = ""; // Limpiar la tabla antes de agregar nuevas filas
 
-    // Asegúrate de que bebidasParaMostrar sea un array
     if (Array.isArray(alimentosParaMostrar)) {
         alimentosParaMostrar.forEach((alimento, index) => {
-            // Comprobar que bebida tenga las propiedades necesarias
-            const producto = alimento.producto || alimento; // Usar bebida.producto si existe
+            const producto = alimento.producto || alimento; // Usar alimento.producto si existe
             if (producto) {
                 const row = tabla.insertRow();
 
-                // Generar las celdas de la tabla
                 row.innerHTML = `
                     <td>${producto.nombre || producto.nombreProducto || "N/A"}</td>
                     <td>${alimento.descripcionProducto || producto.descripcion || "N/A"}</td>
@@ -162,10 +170,9 @@ function actualizarTablaAlimentos(alimentosParaMostrar) {
                     </td>
                 `;
 
-                // Asignar evento para seleccionar la fila
                 row.addEventListener("click", () => seleccionarFila(alimento, index, row));
             } else {
-                console.warn("Alimento no definida en el resultado:", alimento);
+                console.warn("Alimento no definido en el resultado:", alimento);
             }
         });
     } else {
@@ -233,7 +240,10 @@ async function agregarAlimento() {
     try {
         const response = await fetch(`${API_URL}alimento/insert`, {
             method: "POST",
-            headers: {"Content-Type": "application/json"},
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": localStorage.getItem("lastToken") // Enviar el token
+            },
             body: JSON.stringify(data),
         });
 
@@ -248,6 +258,7 @@ async function agregarAlimento() {
         console.error("Error al agregar el alimento:", error);
         notyf.error("Hubo un problema al agregar el alimento.");
     }
+
 }
 
 // Modificar un alimento
@@ -268,7 +279,10 @@ async function modificarAlimento() {
     try {
         const response = await fetch(`${API_URL}alimento/update`, {
             method: "POST",
-            headers: {"Content-Type": "application/json"},
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": localStorage.getItem("lastToken") // Enviar el token
+            },
             body: JSON.stringify(data),
         });
 
@@ -295,6 +309,9 @@ async function cambiarEstatus() {
     try {
         const response = await fetch(`${API_URL}alimento/delete/${alimentoSeleccionado.producto.idProducto}`, {
             method: "POST",
+            headers: {
+                "Authorization": localStorage.getItem("lastToken") // Enviar el token
+            },
         });
 
         if (response.ok) {
@@ -311,40 +328,43 @@ async function cambiarEstatus() {
 }
 
 // Filtrar alimentos por búsqueda
-function filtrarAlimentos() {
+async function filtrarAlimentos() {
     const textoBusqueda = document.getElementById("searchInput").value.trim();
 
-    // Si no hay texto de búsqueda, cargar todos los alimentos
     if (!textoBusqueda) {
-        cargarAlimentos(); 
+        cargarAlimentos();
         return;
     }
 
-    // Construir la ruta para la API
     const ruta = `${API_URL}alimento/search/${encodeURIComponent(textoBusqueda)}`;
-    
-    fetch(ruta)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`Error en la solicitud: ${response.statusText}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log("Resultados de la búsqueda:", data);
 
-            if (Array.isArray(data)) {
-                actualizarTablaAlimentos(data); // Actualizar la tabla con los resultados
-            } else {
-                notyf.error("No se encontraron resultados.");
-                actualizarTablaAlimentos([]); // Limpiar la tabla si no hay resultados
+    try {
+        const response = await fetch(ruta, {
+            method: "GET",
+            headers: {
+                "Authorization": localStorage.getItem("lastToken") // Enviar el token
             }
-        })
-        .catch(error => {
-            console.error("Error al buscar alimentos:", error);
-            notyf.error("Error al realizar la búsqueda. Consulte con el administrador.");
         });
+
+        if (!response.ok) {
+            throw new Error(`Error en la solicitud: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        console.log("Resultados de la búsqueda:", data);
+
+        if (Array.isArray(data)) {
+            actualizarTablaAlimentos(data);
+        } else {
+            notyf.error("No se encontraron resultados.");
+            actualizarTablaAlimentos([]);
+        }
+    } catch (error) {
+        console.error("Error al buscar alimentos:", error);
+        notyf.error("Error al realizar la búsqueda. Consulte con el administrador.");
+    }
 }
+
 // Convertir la imagen a Base64
 function convertToBase64(event) {
     const file = event.target.files[0];

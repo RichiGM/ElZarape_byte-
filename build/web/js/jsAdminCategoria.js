@@ -64,7 +64,14 @@ function validarCampos() {
 // Función para cargar la tabla de categorías
 async function cargarTabla() {
     try {
-        const response = await fetch(`${API_URL}categoria/getall`);
+        const response = await fetch(`${API_URL}categoria/getall`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": localStorage.getItem("lastToken") // Enviar el token
+            }
+        });
+
         if (!response.ok) {
             throw new Error('Error al obtener las categorías: ' + response.status);
         }
@@ -127,6 +134,7 @@ async function agregarCategoria() {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                "Authorization": localStorage.getItem("lastToken") // Enviar el token
             },
             body: JSON.stringify(data),
         });
@@ -166,6 +174,7 @@ async function modificarCategoria() {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                "Authorization": localStorage.getItem("lastToken") // Enviar el token
             },
             body: JSON.stringify(data),
         });
@@ -200,6 +209,7 @@ async function cambiarEstatus() {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                "Authorization": localStorage.getItem("lastToken") // Enviar el token
             },
             body: JSON.stringify(data),
         });
@@ -228,7 +238,14 @@ async function filtrarCategorias() {
     }
 
     try {
-        const response = await fetch(`${API_URL}categoria/search?descripcion=${encodeURIComponent(searchInput)}`);
+        const response = await fetch(`${API_URL}categoria/search?descripcion=${encodeURIComponent(searchInput)}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": localStorage.getItem("lastToken") // Enviar el token
+            }
+        });
+
         if (!response.ok) {
             throw new Error("Error al buscar categorías: " + response.status);
         }

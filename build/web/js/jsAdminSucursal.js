@@ -63,36 +63,47 @@ function contieneMalasPalabras(texto) {
 // Función para cargar las sucursales desde el servidor
 function cargarSucursales() {
     const ruta = `${API_URL}sucursal/getall`;
+    const lastToken = localStorage.getItem("lastToken"); // Obtener el token almacenado
 
-    fetch(ruta)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`Error al obtener las sucursales: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log("Sucursales cargadas desde la API:", data);
-
-            if (Array.isArray(data)) {
-                sucursales = data; 
-                actualizarTabla(sucursales); 
-               
-            } else {
-                console.error("Error: Formato de datos incorrecto", data);
-                notyf.error("Formato de datos incorrecto.");
-            }
-        })
-        .catch(error => {
-            console.error("Error al cargar las sucursales:", error);
-            notyf.error("No se pudieron cargar las sucursales. Consulte con el administrador.");
-        });
+    fetch(ruta, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": lastToken // 🔥 Enviar el token en los headers
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Error al obtener las sucursales: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log("Sucursales cargadas desde la API:", data);
+        if (Array.isArray(data)) {
+            actualizarTabla(data);
+        } else {
+            console.error("Error: Formato de datos incorrecto", data);
+        }
+    })
+    .catch(error => {
+        console.error("Error al cargar las sucursales:", error);
+    });
 }
+
 
 function cargarEstados() {
     return new Promise((resolve, reject) => {
         const ruta = `${API_URL}sucursal/getestados`;
-        fetch(ruta)
+        const lastToken = localStorage.getItem("lastToken"); // Obtener el token
+
+        fetch(ruta, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": lastToken // Enviar el token
+            }
+        })
             .then(response => {
                 if (!response.ok) throw new Error("Error al cargar los estados.");
                 return response.json();
@@ -109,7 +120,6 @@ function cargarEstados() {
                         selectEstado.appendChild(option);
                     });
                     resolve();
-                   
                 } else {
                     reject(new Error("Formato de datos incorrecto."));
                 }
@@ -125,7 +135,15 @@ function cargarEstados() {
 function cargarCiudadesPorEstado(idEstado) {
     return new Promise((resolve, reject) => {
         const ruta = `${API_URL}sucursal/getciudades/${idEstado}`;
-        fetch(ruta)
+        const lastToken = localStorage.getItem("lastToken"); // Obtener el token
+
+        fetch(ruta, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": lastToken // Enviar el token
+            }
+        })
             .then(response => {
                 if (!response.ok) throw new Error("Error al cargar las ciudades.");
                 return response.json();
@@ -141,7 +159,6 @@ function cargarCiudadesPorEstado(idEstado) {
                     selectCiudad.appendChild(option);
                 });
                 resolve();
-                
             })
             .catch(error => {
                 console.error("Error al cargar las ciudades:", error);
@@ -302,10 +319,15 @@ function limpiar() {
 function agregarSucursal() {
     const nuevaSucursal = obtenerDatosFormulario();
     if (!nuevaSucursal) return; // Si los datos son inválidos, no continuar
-  
+
+    const lastToken = localStorage.getItem("lastToken"); // Obtener el token
+
     fetch(`${API_URL}sucursal/add`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+ headers: { 
+            "Content-Type": "application/json",
+            "Authorization": lastToken // Enviar el token
+        },
         body: JSON.stringify(nuevaSucursal),
     })
         .then((response) => {
@@ -327,6 +349,7 @@ function agregarSucursal() {
         });
 }
 
+
 // Función para modificar una sucursal
 function modificarSucursal() {
     if (!indexSucursalSeleccionada) {
@@ -339,9 +362,14 @@ function modificarSucursal() {
 
     sucursalModificada.idSucursal = indexSucursalSeleccionada; // Agregar el ID de la sucursal seleccionada
 
+    const lastToken = localStorage.getItem("lastToken"); // Obtener el token
+
     fetch(`${API_URL}sucursal/update`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+            "Content-Type": "application/json",
+            "Authorization": lastToken // Enviar el token
+        },
         body: JSON.stringify(sucursalModificada),
     })
         .then((response) => {
@@ -370,8 +398,13 @@ function cambiarEstatus() {
         return;
     }
 
+    const lastToken = localStorage.getItem("lastToken"); // Obtener el token
+
     fetch(`${API_URL}sucursal/delete/${indexSucursalSeleccionada}`, {
         method: "DELETE",
+        headers: {
+            "Authorization": lastToken // Enviar el token
+        },
     })
         .then((response) => {
             if (!response.ok) {
@@ -567,36 +600,42 @@ function obtenerDatosFormulario() {
 
 // Función para buscar sucursales
 function buscarSucursales() {
-    const textoBusqueda = document.getElementById("searchInput").value.trim();
+    const filtro = document.getElementById("searchInput").value.trim();
+    const lastToken = localStorage.getItem("lastToken"); // Obtener el token
 
-    if (!textoBusqueda) {
-        cargarSucursales(); // Si no hay texto, cargar todas las sucursales
+    if (!filtro) {
+        cargarSucursales();
         return;
     }
 
-    const ruta = `${API_URL}sucursal/search/${textoBusqueda}`;
-    fetch(ruta)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`Error en la solicitud: ${response.statusText}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log("Resultados de la búsqueda:", data);
+    const ruta = `${API_URL}sucursal/search/${filtro}`;
 
-            if (Array.isArray(data)) {
-                actualizarTabla(data); // Actualizar la tabla con los resultados
-                
-            } else {
-                notyf.error("No se encontraron resultados.");
-            }
-        })
-        .catch(error => {
-            console.error("Error al buscar sucursales:", error);
-            notyf.error("Error al realizar la búsqueda. Consulte con el administrador.");
-        });
+    fetch(ruta, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": lastToken // Enviar el token
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Error al realizar la búsqueda: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log("Resultados de búsqueda desde la API:", data);
+        if (Array.isArray(data)) {
+            actualizarTabla(data);
+        } else {
+            alert("No se encontraron resultados.");
+        }
+    })
+    .catch(error => {
+        console.error("Error en la búsqueda dinámica:", error);
+    });
 }
+
 
 // Cargar sucursales al iniciar
 cargarSucursales();
