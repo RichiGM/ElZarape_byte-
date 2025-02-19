@@ -36,7 +36,6 @@ document.getElementById("loginForm").addEventListener("submit", async function (
     try {
         const response = await fetch(`${API_URL}login/validate`, {
             method: "POST",
-             
             headers: {
                 "Content-Type": "application/json"
             },
@@ -46,10 +45,20 @@ document.getElementById("loginForm").addEventListener("submit", async function (
         if (response.ok) {
             const result = await response.json();
             if (result.success) {
-                notyf.success('¡Inicio de sesión exitoso! Redirigiendo al menú principal...');
-                setTimeout(() => {
-                    window.location.href = "menu.html";
-                }, 1000); // Redirige después de 2 segundos
+                const checkResponse = await fetch(`${API_URL}usuario/cheecky?nombre=${username}`);
+                if (checkResponse.ok) {
+                    const checkResult = await checkResponse.json();
+                    if (checkResult.error) {
+                        notyf.error('Usuario no encontrado. Por favor, verifica tu nombre de usuario.');
+                        return;
+                    }
+                    notyf.success('¡Inicio de sesión exitoso! Redirigiendo al menú principal...');
+                    setTimeout(() => {
+                        window.location.href = "menu.html";
+                    }, 1000); // Redirige después de 1 segundo
+                } else {
+                    notyf.error('Error al verificar el usuario. Intenta nuevamente.');
+                }
             } else {
                 notyf.error('Credenciales incorrectas. Por favor, verifica tu nombre de usuario y contraseña.');
             }

@@ -12,11 +12,14 @@
     </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/velma/Documentos/NetBeansProjects/ElZarape_byte-/web/css/css.css</file>
+            <file>file:/C:/Users/velma/Documentos/NetBeansProjects/ElZarape_byte-/web/adminBebida.html</file>
+            <file>file:/C:/Users/velma/Documentos/NetBeansProjects/ElZarape_byte-/src/java/org/utl/dsm/zarape/rest/RestEstado.java</file>
+            <file>file:/C:/Users/velma/Documentos/NetBeansProjects/ElZarape_byte-/src/java/org/utl/dsm/zarape/rest/RestAlimento.java</file>
+            <file>file:/C:/Users/velma/Documentos/NetBeansProjects/ElZarape_byte-/src/java/org/utl/dsm/zarape/rest/RestCategoria.java</file>
+            <file>file:/C:/Users/velma/Documentos/NetBeansProjects/ElZarape_byte-/src/java/org/utl/dsm/zarape/rest/RestBebida.java</file>
             <file>file:/C:/Users/velma/Documentos/NetBeansProjects/ElZarape_byte-/src/java/org/utl/dsm/zarape/rest/RestLogin.java</file>
             <file>file:/C:/Users/velma/Documentos/NetBeansProjects/ElZarape_byte-/src/java/org/utl/dsm/zarape/rest/RestUsuario.java</file>
-            <file>file:/C:/Users/velma/Documentos/NetBeansProjects/ElZarape_byte-/web/adminUsuario.html</file>
-            <file>file:/C:/Users/velma/Documentos/NetBeansProjects/ElZarape_byte-/web/js/jsAdminUsuario.js</file>
+            <file>file:/C:/Users/velma/Documentos/NetBeansProjects/ElZarape_byte-/src/java/org/utl/dsm/zarape/rest/RestCiudad.java</file>
         </group>
     </open-files>
 </project-private>

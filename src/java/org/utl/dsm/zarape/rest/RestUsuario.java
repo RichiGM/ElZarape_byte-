@@ -148,7 +148,7 @@ public class RestUsuario extends Application {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     public Response cambiarEstatus(
-            @FormParam("idUsuario") @DefaultValue("0") int idUsuario) {
+        @FormParam("idUsuario") @DefaultValue("0") int idUsuario) {
         String out;
         ControllerUsuario controller = new ControllerUsuario();
         try {
@@ -203,6 +203,62 @@ public class RestUsuario extends Application {
               """;
         }
         return Response.ok(out).build();
+    }
+
+    @Path("cheecky")
+    @Produces(MediaType.APPLICATION_JSON)
+    @GET
+    public Response checkingUser(@QueryParam("nombre") @DefaultValue("") String nombre) {
+        String out = null;
+        String result = null;
+        ControllerUsuario controller = new ControllerUsuario();
+
+        try {
+            result = controller.checkUsers(nombre);
+            JsonObject jsonResponse = new JsonObject();
+            if (result == null || result.isEmpty()) {
+                jsonResponse.addProperty("error", "No se encontró un token");
+            } else {
+                jsonResponse.addProperty("token", result);
+            }
+
+            out = new Gson().toJson(jsonResponse);
+        } catch (Exception e) {
+            JsonObject errorResponse = new JsonObject();
+            errorResponse.addProperty("error", "Por ahi no joven");
+            out = errorResponse.toString();
+            System.out.println(e.getMessage());
+        }
+
+        return Response.status(Response.Status.OK).entity(out).build();
+    }
+    
+    @Path("logOut")
+    @Produces(MediaType.APPLICATION_JSON)
+    @GET
+    public Response logOut(@QueryParam("nombre") @DefaultValue("") String nombre) {
+        String out = null;
+        String result = null;
+        ControllerUsuario controller = new ControllerUsuario();
+
+        try {
+            result = controller.logOut(nombre);
+            JsonObject jsonResponse = new JsonObject();
+            if (result == null || result.isEmpty()) {
+                jsonResponse.addProperty("error", "No se encontró un token");
+            } else {
+                jsonResponse.addProperty("token", result);
+            }
+
+            out = new Gson().toJson(jsonResponse);
+        } catch (Exception e) {
+            JsonObject errorResponse = new JsonObject();
+            errorResponse.addProperty("error", "Por ahi no joven");
+            out = errorResponse.toString();
+            System.out.println(e.getMessage());
+        }
+
+        return Response.status(Response.Status.OK).entity(out).build();
     }
 
 }
