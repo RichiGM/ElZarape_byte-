@@ -12,13 +12,12 @@
     </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-<<<<<<< HEAD
-            <file>file:/C:/Users/Ricardo/Documents/NetBeansProjects/ElZarape_byte/src/java/org/utl/dsm/zarape/rest/RestFilter.java</file>
-            <file>file:/C:/Users/Ricardo/Documents/NetBeansProjects/ElZarape_byte/src/java/org/utl/dsm/zarape/rest/RestSucursal.java</file>
+            <file>file:/C:/Users/Ricardo/Documents/NetBeansProjects/ElZarape_byte/web/js/jsAdminCategoria.js</file>
+            <file>file:/C:/Users/Ricardo/Documents/NetBeansProjects/ElZarape_byte/web/header.html</file>
+            <file>file:/C:/Users/Ricardo/Documents/NetBeansProjects/ElZarape_byte/web/js/componentsLoader.js</file>
+            <file>file:/C:/Users/Ricardo/Documents/NetBeansProjects/ElZarape_byte/nbproject/build-impl.xml</file>
             <file>file:/C:/Users/Ricardo/Documents/NetBeansProjects/ElZarape_byte/web/js/jsLogin.js</file>
-=======
-            <file>file:/C:/ElZarape/ElZarape_byte-/web/index.html</file>
->>>>>>> d7c78a1e80168a5a45cf166e29b2514ec72fd2a4
+            <file>file:/C:/Users/Ricardo/Documents/NetBeansProjects/ElZarape_byte/src/java/org/utl/dsm/zarape/rest/RestLogin.java</file>
         </group>
     </open-files>
 </project-private>
