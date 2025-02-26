@@ -15,6 +15,23 @@ let fotoBase64 = "";
 let alimentosSeleccionados = [];
 let bebidasSeleccionadas = [];
 
+// Función para verificar si hay una sesión activa
+function checkSession() {
+    const lastToken = localStorage.getItem("lastToken");
+    if (!lastToken) {
+        console.warn("Acceso denegado: usuario no autenticado.");
+        
+        // Limpiar la pantalla antes de redirigir
+        document.body.innerHTML = "";
+
+        // Redirigir a la página de acceso denegado
+        window.location.href = "AccesoDenegado.html";
+
+        // Detener la ejecución de cualquier otro código
+        return;
+    }
+}
+
 // Cargar alimentos y bebidas en los checkboxes
 fetch('../json/jsonAlimento.json')
     .then(response => response.json())
@@ -316,3 +333,8 @@ function actualizaTabla() {
     document.getElementById("tblCombos").innerHTML = cuerpo;
     filtrarCombos();
 }
+
+// Verificar sesión al cargar el documento
+document.addEventListener("DOMContentLoaded", () => {
+    checkSession();
+});

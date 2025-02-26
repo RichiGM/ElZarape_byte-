@@ -27,6 +27,42 @@ const notyf = new Notyf({
     ]
 });
 
+// Función para verificar si hay una sesión activa
+function checkSession() {
+    const lastToken = localStorage.getItem("lastToken");
+    if (!lastToken) {
+        console.warn("Acceso denegado: usuario no autenticado.");
+        
+        // Limpiar la pantalla antes de redirigir
+        document.body.innerHTML = "";
+
+        // Redirigir a la página de acceso denegado
+        window.location.href = "AccesoDenegado.html";
+
+        // Detener la ejecución de cualquier otro código
+        return;
+    }
+}
+
+// Función para cargar componentes asíncronamente
+async function loadComponent(id, file) {
+    try {
+        const element = document.getElementById(id);
+        const response = await fetch(file);
+        if (!response.ok) {
+            throw new Error(`Error al cargar ${file}: ${response.status}`);
+        }
+        const html = await response.text();
+        element.innerHTML = html;
+
+        // Verificar si es el header y ejecutar la lógica del usuario
+        if (id === "header") {
+            updateUserInfo();
+        }
+    } catch (error) {
+        console.error("Error al cargar el componente:", error);
+    }
+}
 // Botones de acción
 const btnModificar = document.getElementById("btnModificar");
 const btnCambiarEstatus = document.getElementById("btnCambiarEstatus");
@@ -41,6 +77,7 @@ let categoriaSeleccionada = null; // Categoría seleccionada para modificar o ca
 
 document.addEventListener("DOMContentLoaded", () => {
     cargarTabla();
+    checkSession();
 });
 
 // Función para validar campos vacíos

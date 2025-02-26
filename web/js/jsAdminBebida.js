@@ -29,6 +29,42 @@ const notyf = new Notyf({
     ]
 });
 
+// Función para verificar si hay una sesión activa
+function checkSession() {
+    const lastToken = localStorage.getItem("lastToken");
+    if (!lastToken) {
+        console.warn("Acceso denegado: usuario no autenticado.");
+        
+        // Limpiar la pantalla antes de redirigir
+        document.body.innerHTML = "";
+
+        // Redirigir a la página de acceso denegado
+        window.location.href = "AccesoDenegado.html";
+
+        // Detener la ejecución de cualquier otro código
+        return;
+    }
+}
+
+// Función para cargar componentes asíncronamente
+async function loadComponent(id, file) {
+    try {
+        const element = document.getElementById(id);
+        const response = await fetch(file);
+        if (!response.ok) {
+            throw new Error(`Error al cargar ${file}: ${response.status}`);
+        }
+        const html = await response.text();
+        element.innerHTML = html;
+
+        // Verificar si es el header y ejecutar la lógica del usuario
+        if (id === "header") {
+            updateUserInfo();
+        }
+    } catch (error) {
+        console.error("Error al cargar el componente:", error);
+    }
+}
 // Inicialización de botones y variables globales
 const btnModificar = document.getElementById("btnModificar");
 const btnCambiarEstatus = document.getElementById("btnCambiarEstatus");
@@ -44,6 +80,7 @@ let bebidaSeleccionada = null; // Bebida seleccionada actualmente
 document.addEventListener("DOMContentLoaded", () => {
     cargarCategorias(); // Cargar categorías al inicio
     cargarBebidas(); // Cargar bebidas registradas
+    checkSession();
 });
 
 // Función para cargar las bebidas desde el backend

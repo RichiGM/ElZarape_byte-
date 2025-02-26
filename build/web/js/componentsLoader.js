@@ -20,11 +20,11 @@ async function loadComponent(id, file) {
 
 // Cargar el header y el footer
 document.addEventListener("DOMContentLoaded", () => {
-    loadComponent("header", "header.html");
-    loadComponent("footer", "footer.html");
+    loadComponent("header", "Header.html");
+    loadComponent("footer", "Footer.html");
 });
 
-const API_URL = "http://localhost:8080/ElZarape2/api/";
+const API_URL = "http://10.16.8.55:8080/ElZarape2/api/";
 
 // Función para mostrar el usuario en el header
 function updateUserInfo() {
@@ -94,7 +94,7 @@ function updateUserInfo() {
 
                 // ✅ Redirigir SIEMPRE después de borrar `localStorage`
                 console.log("Redirigiendo al login...");
-                window.location.href = "index.html"; // Cambia a la página de login
+                window.location.href = "Login.html"; // Cambia a la página de login
             }
         });
     }
