@@ -841,7 +841,7 @@ exists or setup the property manually. For example like this:
         <ant antfile="${project.ElZarape_core}/build.xml" inheritall="false" target="jar">
             <property name="deploy.on.save" value="false"/>
         </ant>
-       
+        
         <ant antfile="${project.ElZarape_model}/build.xml" inheritall="false" target="jar">
             <property name="deploy.on.save" value="false"/>
         </ant>
@@ -850,7 +850,7 @@ exists or setup the property manually. For example like this:
         <ant antfile="${project.ElZarape_core}/build.xml" inheritall="false" target="jar">
             <property name="deploy.on.save" value="false"/>
         </ant>
-        
+       
         <ant antfile="${project.ElZarape_model}/build.xml" inheritall="false" target="jar">
             <property name="deploy.on.save" value="false"/>
         </ant>
@@ -1491,7 +1491,7 @@ exists or setup the property manually. For example like this:
             -->
     <target depends="init" name="deps-clean" unless="no.deps">
         <ant antfile="${project.ElZarape_core}/build.xml" inheritall="false" target="clean"/>
-       
+        
         <ant antfile="${project.ElZarape_model}/build.xml" inheritall="false" target="clean"/>
     </target>
     <target depends="init" name="do-clean">
