@@ -12,20 +12,11 @@
     </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/Ricardo/Documents/NetBeansProjects/ElZarape_byte/web/js/jsAdminCombo.js</file>
-            <file>file:/C:/Users/Ricardo/Documents/NetBeansProjects/ElZarape_byte/web/js/jsAlimento.js</file>
-            <file>file:/C:/Users/Ricardo/Documents/NetBeansProjects/ElZarape_byte/web/js/jsAdminBebida.js</file>
-            <file>file:/C:/Users/Ricardo/Documents/NetBeansProjects/ElZarape_byte/web/js/jsAdminSucursal.js</file>
-            <file>file:/C:/Users/Ricardo/Documents/NetBeansProjects/ElZarape_byte/web/js/jsCombo.js</file>
+            <file>file:/C:/Users/Ricardo/Documents/NetBeansProjects/ElZarape_byte/web/Comanda.html</file>
+            <file>file:/C:/Users/Ricardo/Documents/NetBeansProjects/ElZarape_byte/web/AccesoDenegado.html</file>
+            <file>file:/C:/Users/Ricardo/Documents/NetBeansProjects/ElZarape_byte/web/Login.html</file>
             <file>file:/C:/Users/Ricardo/Documents/NetBeansProjects/ElZarape_byte/web/js/componentsLoader.js</file>
-            <file>file:/C:/Users/Ricardo/Documents/NetBeansProjects/ElZarape_byte/web/css/css.css</file>
-            <file>file:/C:/Users/Ricardo/Documents/NetBeansProjects/ElZarape_byte/web/js/jsSucursal.js</file>
-            <file>file:/C:/Users/Ricardo/Documents/NetBeansProjects/ElZarape_byte/web/js/jsBebida.js</file>
-            <file>file:/C:/Users/Ricardo/Documents/NetBeansProjects/ElZarape_byte/web/js/jsAdminUsuario.js</file>
-            <file>file:/C:/Users/Ricardo/Documents/NetBeansProjects/ElZarape_byte/web/js/jsAdminCategoria.js</file>
-            <file>file:/C:/Users/Ricardo/Documents/NetBeansProjects/ElZarape_byte/web/menu.html</file>
-            <file>file:/C:/Users/Ricardo/Documents/NetBeansProjects/ElZarape_byte/web/js/jsLogin.js</file>
-            <file>file:/C:/Users/Ricardo/Documents/NetBeansProjects/ElZarape_byte/web/js/jsAdminAlimento.js</file>
+            <file>file:/C:/Users/Ricardo/Documents/NetBeansProjects/ElZarape_byte/web/WEB-INF/web.xml</file>
         </group>
     </open-files>
 </project-private>
