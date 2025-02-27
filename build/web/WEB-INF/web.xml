@@ -33,9 +33,5 @@
         <url-pattern>/api/*</url-pattern>
     </servlet-mapping>
 
-    <!-- Configuración de la página de inicio -->
-    <welcome-file-list>
-        <welcome-file>Comanda.html</welcome-file>
-        
-    </welcome-file-list>
+    
 </web-app>

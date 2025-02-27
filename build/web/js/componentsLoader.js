@@ -20,8 +20,8 @@ async function loadComponent(id, file) {
 
 // Cargar el header y el footer
 document.addEventListener("DOMContentLoaded", () => {
-    loadComponent("header", "Header.html");
-    loadComponent("footer", "Footer.html");
+    loadComponent("header", "header.html");
+    loadComponent("footer", "footer.html");
 });
 
 const API_URL = "http://localhost:8080/ElZarape2/api/";
@@ -86,7 +86,7 @@ function updateUserInfo() {
                 localStorage.removeItem("lastToken");
 
                 console.log("Redirigiendo al login...");
-                window.location.href = "Login.html"; // Redirigir al login siempre que se haga logout
+                window.location.href = "login.html"; // Redirigir al login siempre que se haga logout
             }
         });
     }

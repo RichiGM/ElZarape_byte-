@@ -70,7 +70,7 @@ document.getElementById("loginForm").addEventListener("submit", async function (
 
                 notyf.success(`¡Inicio de sesión exitoso! Bienvenido, ${username}. Redirigiendo al menú principal...`);
                 setTimeout(() => {
-                    window.location.href = "Menu.html";
+                    window.location.href = "menu.html";
                 }, 1000);
             } else {
                 notyf.error('Credenciales incorrectas. Por favor, verifica tu nombre de usuario y contraseña.');

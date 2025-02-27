@@ -39,7 +39,7 @@ function checkSession() {
         document.body.innerHTML = "";
 
         // Redirigir a la página de acceso denegado
-        window.location.href = "AccesoDenegado.html";
+        window.location.href = "accesoDenegado.html";
 
         // Detener la ejecución de cualquier otro código
         return;
