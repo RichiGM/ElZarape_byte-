@@ -17,7 +17,7 @@ public class RestFilter implements ContainerRequestFilter {
         String path = requestContext.getUriInfo().getPath();
 
         // 🔹 Permitir acceso libre a login, logout y cheecky
-        if (path.contains("usuario/logout") || path.contains("usuario/cheecky") || path.contains("login/validate")) {
+        if (path.contains("usuario/logout") || path.contains("usuario/cheecky") || path.contains("login/validate") || path.contains("ticket/insert") || path.contains("ticket/estatus") || path.contains("ticket/pagado") || path.contains("ticket/detalle/insert")) {
             return; // No se requiere autenticación para estas rutas
         }
 
