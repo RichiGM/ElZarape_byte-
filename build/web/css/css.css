@@ -540,3 +540,329 @@ body {
     font-weight: bold;
     color: black;
 }
+/* Diseño del layout de la página */
+.menu-section {
+    padding: 20px;
+    background-color: #Fef3e2;
+    flex-grow: 1;
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: -15px;
+    margin-left: -15px;
+}
+
+/* Ajuste para los productos a la izquierda y carrito a la derecha */
+.col-md-8, .col-md-4 {
+    padding-right: 15px;
+    padding-left: 15px;
+}
+
+@media (max-width: 768px) {
+    .col-md-8, .col-md-4 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+
+/* Estilo para el carrito fijo en la derecha */
+.cart-sidebar {
+    position: relative;
+    background-color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-top: 20px;
+    height: fit-content;
+}
+
+.cart-sidebar .cart-content {
+    background-color: #fff;
+    border-radius: 15px;
+    padding: 0;
+}
+
+.cart-sidebar h3 {
+    color: #Fa812f;
+    font-size: 1.2em;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.cart-sidebar .location-icon {
+    font-size: 1em;
+}
+
+.cart-sidebar .table {
+    margin-bottom: 15px;
+}
+
+.cart-sidebar .table th, .cart-sidebar .table td {
+    vertical-align: middle;
+    text-align: center;
+    padding: 8px;
+    border-top: none;
+}
+
+.cart-sidebar .table th {
+    background-color: #Fef3e2;
+    color: #Fa812f;
+    font-weight: bold;
+}
+
+.cart-sidebar .input-group {
+    margin: 0 auto;
+}
+
+.cart-sidebar .text-end {
+    margin-top: 15px;
+    font-size: 1em;
+    color: #333;
+    text-align: right;
+}
+
+.cart-sidebar .text-end p {
+    margin: 5px 0;
+    color: #Fa812f;
+    font-weight: bold;
+}
+
+.cart-sidebar .cancel-container {
+    margin-top: 15px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.cart-sidebar .btn-cancelar, .cart-sidebar .btn-danger {
+    width: 45%;
+    padding: 10px;
+    font-size: 1em;
+    background-color: #Fa812f;
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    cursor: pointer;
+}
+
+.cart-sidebar .btn-cancelar:hover, .cart-sidebar .btn-danger:hover {
+    background-color: #FAAF08;
+}
+
+/* Ajuste para pantallas pequeñas */
+@media (max-width: 768px) {
+    .cart-sidebar {
+        position: static;
+        width: 100%;
+        margin-top: 20px;
+    }
+
+    .cart-sidebar .cancel-container {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .cart-sidebar .btn-cancelar, .cart-sidebar .btn-danger {
+        width: 100%;
+    }
+}
+
+/* Ajuste para el dropdown de sucursales */
+#sucursalDropdown {
+    background-color: #fff;
+    border: 2px solid #Fa812f;
+    color: #Fa812f;
+    padding: 8px;
+    border-radius: 5px;
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    appearance: none;
+}
+
+#sucursalDropdown:focus {
+    outline: none;
+    border-color: #FAAF08;
+    box-shadow: 0 0 5px rgba(250, 175, 8, 0.5);
+}
+
+/* Ajuste para los títulos de categorías */
+.menu-category h2 {
+    color: #Fa812f;
+    font-size: 2em;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+/* Ajuste para los ítems del menú con scroll horizontal */
+.menu-items {
+    display: flex; /* Usamos flex para disposición horizontal */
+    flex-wrap: nowrap; /* Evita que los elementos se envuelvan a la siguiente línea */
+    gap: 20px;
+    max-width: 1050px; /* Ancho máximo para que 5 elementos quepan antes del scroll (200px por tarjeta + márgenes) */
+    overflow-x: auto; /* Activa scroll horizontal */
+    padding: 10px;
+    background-color: transparent; /* Eliminamos el fondo blanco */
+    border: none; /* Eliminamos el borde naranja */
+    scrollbar-width: thin; /* Scroll delgado en Firefox */
+    scrollbar-color: #Fa812f #Fef3e2; /* Colores del scroll */
+}
+
+/* Establecer un tamaño mínimo para las tarjetas */
+.menu-items .card {
+    min-width: 200px; /* Tamaño mínimo fijo para cada tarjeta */
+    background: none;
+    border: 2px solid #fff;
+    border-radius: 10px;
+    text-align: center;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.menu-items .card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.menu-items .card-img-top {
+    border-radius: 10px 10px 0 0;
+    object-fit: cover;
+    height: 150px;
+    width: 100%;
+}
+
+.menu-items .card-body {
+    padding: 10px;
+}
+
+.menu-items .card-title {
+    color: #333;
+    font-size: 1.1em;
+    margin-top: 10px;
+}
+
+.menu-items .card-text {
+    color: #Fa812f;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+/* Personalización del scroll en Webkit (Chrome, Safari) */
+.menu-items::-webkit-scrollbar {
+    height: 8px; /* Altura para scroll horizontal */
+}
+
+.menu-items::-webkit-scrollbar-track {
+    background: #Fef3e2;
+    border-radius: 10px;
+}
+
+.menu-items::-webkit-scrollbar-thumb {
+    background: #Fa812f;
+    border-radius: 10px;
+}
+
+.menu-items::-webkit-scrollbar-thumb:hover {
+    background: #FAAF08;
+}
+
+/* Estilo para el modal de pago */
+.cart-modal, .payment-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.cart-content, .payment-content {
+    background-color: #fff;
+    margin: 5% auto;
+    padding: 20px;
+    width: 80%;
+    max-width: 600px;
+    border-radius: 10px;
+    position: relative;
+}
+
+.cart-content h3, .payment-content h3 {
+    color: #Fa812f;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.cart-content .table, .payment-content .table {
+    margin-bottom: 20px;
+}
+
+.cart-content .text-end, .payment-content .text-end {
+    margin-top: 20px;
+    font-size: 1.1em;
+    color: #333;
+    text-align: right;
+}
+
+.cart-content .text-end p, .payment-content .text-end p {
+    margin: 5px 0;
+    color: #Fa812f;
+    font-weight: bold;
+}
+
+.cart-content .cancel-container, .payment-content .cancel-container {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+}
+
+.cart-content .btn-cancelar, .cart-content .btn-danger, .payment-content .btn-danger {
+    margin: 0 10px;
+    padding: 10px 20px;
+    font-size: 1em;
+    background-color: #Fa812f;
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    cursor: pointer;
+}
+
+.cart-content .btn-cancelar:hover, .cart-content .btn-danger:hover, .payment-content .btn-danger:hover {
+    background-color: #FAAF08;
+}
+
+.payment-content .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    color: #Fa812f;
+    cursor: pointer;
+}
+
+.payment-content .form-label {
+    color: #333;
+    font-weight: bold;
+}
+
+.payment-content .form-control {
+    border: 2px solid #Fa812f;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.payment-content .form-control:focus {
+    border-color: #FAAF08;
+    outline: none;
+    box-shadow: 0 0 5px rgba(250, 175, 8, 0.5);
+}
+
+/* Estilo para los botones de cantidad */
+.cantidad-input {
+    text-align: center;
+    width: 60px;
+}

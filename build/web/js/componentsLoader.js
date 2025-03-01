@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
     loadComponent("footer", "footer.html");
 });
 
-const API_URL = "http://10.16.8.55:8080/ElZarape2/api/";
+const API_URL = "http://localhost:8080/ElZarape2/api/";
 
 // Función para mostrar el usuario en el header
 function updateUserInfo() {
