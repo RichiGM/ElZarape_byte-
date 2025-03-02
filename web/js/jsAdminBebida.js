@@ -85,7 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Función para cargar las bebidas desde el backend
 async function cargarBebidas() {
-    const ruta = `${API_URL}bebidas/getall`;
+    const ruta = `${API_URL}bebida/getall`;
 
     try {
         const response = await fetch(ruta, {
@@ -139,7 +139,7 @@ async function agregarBebida() {
     };
 
     try {
-        const response = await fetch(`${API_URL}bebidas/insert`, {
+        const response = await fetch(`${API_URL}bebida/insert`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -220,7 +220,7 @@ async function modificarBebida() {
     };
 
     try {
-        const response = await fetch(`${API_URL}bebidas/update`, {
+        const response = await fetch(`${API_URL}bebida/update`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
@@ -344,7 +344,7 @@ async function cambiarEstatus() {
     const idProducto = bebidaSeleccionada.producto.idProducto;
 
     try {
-        const response = await fetch(`${API_URL}bebidas/cambiarEstatus/${idProducto}`, {
+        const response = await fetch(`${API_URL}bebida/cambiarEstatus/${idProducto}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
@@ -375,7 +375,7 @@ async function filtrarBebidas() {
     }
 
     // Construir la ruta para la API
-    const ruta = `${API_URL}bebidas/search/${encodeURIComponent(textoBusqueda)}`;
+    const ruta = `${API_URL}bebida/search/${encodeURIComponent(textoBusqueda)}`;
     
     try {
         const response = await fetch(ruta, {

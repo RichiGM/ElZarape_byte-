@@ -161,4 +161,20 @@ public class RestAlimento extends Application {
         }
     }
 
+    @Path("getallCliente")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAllAlimentosCliente() {
+        ControllerAlimento controller = new ControllerAlimento();
+        Gson gson = new Gson();
+
+        try {
+            String out = gson.toJson(controller.getAllAlimentosCliente());
+            return Response.ok(out).build();
+        } catch (Exception e) {
+            return Response.serverError().entity("""
+                  {"result":"Error al obtener los alimentos"}
+                  """).build();
+        }
+    }
 }

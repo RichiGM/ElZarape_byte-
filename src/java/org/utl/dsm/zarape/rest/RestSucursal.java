@@ -181,55 +181,111 @@ public class RestSucursal extends Application {
     }
 
     @Path("search/{filtro}")
-@GET
-@Produces(MediaType.APPLICATION_JSON)
-public Response searchSucursales(@PathParam("filtro") String filtro) {
-    try {
-        List<Sucursal> sucursales = controller.searchSucursales(filtro);
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response searchSucursales(@PathParam("filtro") String filtro) {
+        try {
+            List<Sucursal> sucursales = controller.searchSucursales(filtro);
 
-        // Convertir la lista de sucursales a un formato JSON
-        List<Map<String, Object>> respuesta = new ArrayList<>();
-        for (Sucursal sucursal : sucursales) {
-            Map<String, Object> sucursalData = new HashMap<>();
-            sucursalData.put("idSucursal", sucursal.getIdSucursal());
-            sucursalData.put("nombre", sucursal.getNombre());
-            sucursalData.put("latitud", sucursal.getLatitud());
-            sucursalData.put("longitud", sucursal.getLongitud());
-            sucursalData.put("foto", sucursal.getFoto());
-            sucursalData.put("urlWeb", sucursal.getUrlWeb());
-            sucursalData.put("horarios", sucursal.getHorarios());
-            sucursalData.put("calle", sucursal.getCalle());
-            sucursalData.put("numCalle", sucursal.getNumCalle());
-            sucursalData.put("colonia", sucursal.getColonia());
+            // Convertir la lista de sucursales a un formato JSON
+            List<Map<String, Object>> respuesta = new ArrayList<>();
+            for (Sucursal sucursal : sucursales) {
+                Map<String, Object> sucursalData = new HashMap<>();
+                sucursalData.put("idSucursal", sucursal.getIdSucursal());
+                sucursalData.put("nombre", sucursal.getNombre());
+                sucursalData.put("latitud", sucursal.getLatitud());
+                sucursalData.put("longitud", sucursal.getLongitud());
+                sucursalData.put("foto", sucursal.getFoto());
+                sucursalData.put("urlWeb", sucursal.getUrlWeb());
+                sucursalData.put("horarios", sucursal.getHorarios());
+                sucursalData.put("calle", sucursal.getCalle());
+                sucursalData.put("numCalle", sucursal.getNumCalle());
+                sucursalData.put("colonia", sucursal.getColonia());
 
-            if (sucursal.getCiudad() != null) {
-                sucursalData.put("ciudad", Map.of(
-                    "idCiudad", sucursal.getCiudad().getIdCiudad(),
-                    "nombre", sucursal.getCiudad().getNombre(),
-                    "idEstado", sucursal.getCiudad().getIdEstado()
-                ));
+                if (sucursal.getCiudad() != null) {
+                    sucursalData.put("ciudad", Map.of(
+                            "idCiudad", sucursal.getCiudad().getIdCiudad(),
+                            "nombre", sucursal.getCiudad().getNombre(),
+                            "idEstado", sucursal.getCiudad().getIdEstado()
+                    ));
+                }
+
+                if (sucursal.getEstado() != null) {
+                    sucursalData.put("estado", Map.of(
+                            "idEstado", sucursal.getEstado().getIdEstado(),
+                            "nombre", sucursal.getEstado().getNombre()
+                    ));
+                }
+
+                // Retornar el atributo sucursalActivo correctamente
+                sucursalData.put("sucursalActivo", sucursal.getActivo());
+
+                respuesta.add(sucursalData);
             }
 
-            if (sucursal.getEstado() != null) {
-                sucursalData.put("estado", Map.of(
-                    "idEstado", sucursal.getEstado().getIdEstado(),
-                    "nombre", sucursal.getEstado().getNombre()
-                ));
-            }
-
-            // Retornar el atributo sucursalActivo correctamente
-            sucursalData.put("sucursalActivo", sucursal.getActivo());
-
-            respuesta.add(sucursalData);
+            return Response.ok(new Gson().toJson(respuesta)).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("{\"error\":\"Error al realizar la búsqueda de sucursales: " + e.getMessage() + "\"}")
+                    .build();
         }
-
-        return Response.ok(new Gson().toJson(respuesta)).build();
-    } catch (Exception e) {
-        e.printStackTrace();
-        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                .entity("{\"error\":\"Error al realizar la búsqueda de sucursales: " + e.getMessage() + "\"}")
-                .build();
     }
-}
+    
+    @Path("getallCliente")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAllSucursalesCliente() {
+        try {
+            List<Sucursal> sucursales = controller.getAllSucursalesCliente();
 
+            // Convertir la lista de sucursales a un formato JSON
+            List<Map<String, Object>> respuesta = new ArrayList<>();
+            for (Sucursal sucursal : sucursales) {
+                Map<String, Object> sucursalData = new HashMap<>();
+                sucursalData.put("idSucursal", sucursal.getIdSucursal());
+                sucursalData.put("nombre", sucursal.getNombre());
+                sucursalData.put("latitud", sucursal.getLatitud());
+                sucursalData.put("longitud", sucursal.getLongitud());
+                sucursalData.put("foto", sucursal.getFoto());
+                sucursalData.put("urlWeb", sucursal.getUrlWeb());
+                sucursalData.put("horarios", sucursal.getHorarios());
+                sucursalData.put("calle", sucursal.getCalle());
+                sucursalData.put("numCalle", sucursal.getNumCalle());
+                sucursalData.put("colonia", sucursal.getColonia());
+
+                // Construir el objeto ciudad
+                if (sucursal.getCiudad() != null) {
+                    Map<String, Object> ciudadData = new HashMap<>();
+                    ciudadData.put("idCiudad", sucursal.getCiudad().getIdCiudad());
+                    ciudadData.put("nombre", sucursal.getCiudad().getNombre());
+                    ciudadData.put("idEstado", sucursal.getCiudad().getIdEstado());
+                    sucursalData.put("ciudad", ciudadData);
+                } else {
+                    sucursalData.put("ciudad", null);
+                }
+
+                // Construir el objeto estado
+                if (sucursal.getEstado() != null) {
+                    Map<String, Object> estadoData = new HashMap<>();
+                    estadoData.put("idEstado", sucursal.getEstado().getIdEstado());
+                    estadoData.put("nombre", sucursal.getEstado().getNombre());
+                    sucursalData.put("estado", estadoData);
+                } else {
+                    sucursalData.put("estado", null);
+                }
+
+                sucursalData.put("sucursalActivo", sucursal.getActivo());
+                respuesta.add(sucursalData);
+            }
+
+            return Response.ok(new Gson().toJson(respuesta)).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            String errorMessage = e.getMessage() != null ? e.getMessage() : "Error desconocido";
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("{\"error\":\"" + errorMessage + "\"}")
+                    .build();
+        }
+    }
 }

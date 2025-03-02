@@ -24,8 +24,8 @@ public class RestTicket extends Application {
         String out;
         try {
             Ticket ticket = gson.fromJson(jsonInput, Ticket.class);
-            controller.insertTicket(ticket);
-            out = "{\"result\":\"Ticket agregado correctamente\"}";
+            int ticketId = controller.insertTicket(ticket); // Obtener el ID del ticket insertado
+            out = "{\"result\":\"Ticket agregado correctamente\", \"ticketId\":" + ticketId + "}";
         } catch (Exception e) {
             out = "{\"result\":\"Error al agregar el ticket\"}";
         }
@@ -36,10 +36,10 @@ public class RestTicket extends Application {
     @Path("estatus")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    public Response cambiarEstatus(@QueryParam("idTicket") int idTicket, @QueryParam("estatus") int estatus) {
+    public Response cambiarEstatus(@QueryParam("idTicket") int idTicket) {
         String out;
         try {
-            controller.cambiarEstatusTicket(idTicket, estatus);
+            controller.cambiarEstatusTicket(idTicket);
             out = "{\"result\":\"Estatus del ticket cambiado correctamente\"}";
         } catch (Exception e) {
             out = "{\"result\":\"Error al cambiar el estatus del ticket\"}";
@@ -51,10 +51,10 @@ public class RestTicket extends Application {
     @Path("pagado")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    public Response cambiarPagado(@QueryParam("idTicket") int idTicket, @QueryParam("pagado") String pagado) {
+    public Response cambiarPagado(@QueryParam("idTicket") int idTicket) {
         String out;
         try {
-            controller.cambiarPagadoTicket(idTicket, pagado);
+            controller.cambiarPagadoTicket(idTicket);
             out = "{\"result\":\"Estado de pago cambiado correctamente\"}";
         } catch (Exception e) {
             out = "{\"result\":\"Error al cambiar el estado de pago\"}";
