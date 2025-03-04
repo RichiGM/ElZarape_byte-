@@ -116,7 +116,7 @@ async function cargarTabla() {
             let fila = `
                 <tr onclick="selectUsuario(${index});">
                     <td>${usuario.usuario.nombre}</td>
-                    <td>${usuario.usuario.contrasenia}</td>
+                   
                     <td>${usuario.persona ? usuario.persona.nombre : "N/A"}</td>
                     <td>${usuario.persona ? usuario.persona.apellidos : "N/A"}</td>
                     <td>${usuario.persona ? usuario.persona.telefono : "N/A"}</td>
