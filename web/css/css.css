@@ -214,7 +214,6 @@ h2 {
     padding-bottom: 10px;
     color: #fff;
     font-size: 2em;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
     z-index: 1;
 }
 /* Estilos para los botones en las páginas de administración */
@@ -866,4 +865,172 @@ body {
 .cantidad-input {
     text-align: center;
     width: 60px;
+}
+
+a.btn-custom-queue {
+    background-color: #Fa812f !important;
+    color: #fff !important;
+    border: none !important;
+    padding: 10px 20px !important;
+    border-radius: 8px !important;
+    font-size: 1em !important;
+    cursor: pointer !important;
+    transition: background-color 0.2s ease !important;
+    margin-right: 10px !important;
+}
+
+a.btn-custom-queue:hover {
+    background-color: #FAAF08 !important;
+}
+
+/* Estilos para la cola de pedidos (pedidosRegistro.html) */
+.order-queue {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 50px;
+}
+
+.order-card {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    padding: 20px;
+    transition: all 0.3s ease;
+}
+
+/* Estilo para el pedido activo (el primero en la cola) */
+.order-card.active-order {
+    transform: scale(1.05); /* Ligeramente más grande */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2), 0 0 20px rgba(255, 111, 97, 0.5); /* Sombra con un toque de color coral */
+    z-index: 10;
+    background-color: #fff;
+}
+
+/* Estilo para los pedidos en la cola (detrás del activo) */
+.order-card.background-order {
+    transform: scale(0.95); /* Ligeramente más pequeños */
+    opacity: 0.85; /* Efecto de difuminado */
+    filter: brightness(0.95); /* Reducir un poco el brillo */
+    z-index: 5;
+}
+
+.order-header {
+    padding: 15px;
+    border-radius: 8px 8px 0 0;
+    position: relative;
+}
+
+.order-header h3 {
+    margin: 0;
+    font-size: 1.8em;
+    color: #Fa812f;
+    font-weight: bold;
+}
+
+.order-header p {
+    margin: 8px 0;
+    color: #333;
+    font-size: 1.1em;
+}
+
+/* Estilo para la etiqueta de estatus */
+.status-label {
+    color: #fff;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 0.9em;
+    display: inline-block;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+
+
+/* Estilos para la lista de comandas (comandas.html) */
+.comandas-list {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    padding: 20px;
+}
+
+.comanda-card {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    transition: all 0.3s ease;
+}
+
+.comanda-header {
+    padding: 15px;
+    border-radius: 8px 8px 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.comanda-header h3 {
+    margin: 0;
+    font-size: 1.8em;
+    color: #Fa812f;
+    font-weight: bold;
+}
+
+.comanda-header p {
+    margin: 8px 0;
+    color: #333;
+    font-size: 1.1em;
+}
+
+.comanda-details {
+    padding: 15px;
+}
+
+.details-title {
+    text-align: center;
+    font-size: 1.2em;
+    color: #Fa812f;
+    margin-bottom: 15px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.comanda-details .table {
+    margin-bottom: 0;
+}
+
+.comanda-details .table th {
+    background-color: #Fef3e2;
+    color: #Fa812f;
+    font-weight: bold;
+    text-align: center;
+}
+
+.comanda-details .table td {
+    vertical-align: middle;
+    text-align: center;
+}
+
+/* Estilo para el dropdown de estatus en Consulta de Comandas */
+.status-select {
+    background-color: #fff;
+    border: 2px solid #Fa812f;
+    color: #Fa812f;
+    padding: 8px;
+    border-radius: 5px;
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    appearance: none;
+    width: 150px;
+    font-size: 1em;
+}
+
+.status-select:focus {
+    outline: none;
+    border-color: #FAAF08;
+    box-shadow: 0 0 5px rgba(250, 175, 8, 0.5);
 }

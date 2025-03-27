@@ -8,6 +8,8 @@ import jakarta.ws.rs.core.Response;
 import org.utl.dsm.zarape.controller.ControllerTicket;
 import org.utl.dsm.zarape.model.Ticket;
 import org.utl.dsm.zarape.model.DetalleTicket;
+import java.util.List;
+import org.utl.dsm.zarape.model.Comanda;
 
 @Path("ticket")
 public class RestTicket extends Application {
@@ -27,7 +29,7 @@ public class RestTicket extends Application {
             int ticketId = controller.insertTicket(ticket); // Obtener el ID del ticket insertado
             out = "{\"result\":\"Ticket agregado correctamente\", \"ticketId\":" + ticketId + "}";
         } catch (Exception e) {
-            out = "{\"result\":\"Error al agregar el ticket\"}";
+            out = "{\"result\":\"Error al agregar el ticket: " + e.getMessage() + "\"}";
         }
         return Response.ok(out).build();
     }
@@ -42,7 +44,7 @@ public class RestTicket extends Application {
             controller.cambiarEstatusTicket(idTicket);
             out = "{\"result\":\"Estatus del ticket cambiado correctamente\"}";
         } catch (Exception e) {
-            out = "{\"result\":\"Error al cambiar el estatus del ticket\"}";
+            out = "{\"result\":\"Error al cambiar el estatus del ticket: " + e.getMessage() + "\"}";
         }
         return Response.ok(out).build();
     }
@@ -57,7 +59,7 @@ public class RestTicket extends Application {
             controller.cambiarPagadoTicket(idTicket);
             out = "{\"result\":\"Estado de pago cambiado correctamente\"}";
         } catch (Exception e) {
-            out = "{\"result\":\"Error al cambiar el estado de pago\"}";
+            out = "{\"result\":\"Error al cambiar el estado de pago: " + e.getMessage() + "\"}";
         }
         return Response.ok(out).build();
     }
@@ -74,7 +76,37 @@ public class RestTicket extends Application {
             controller.agregarDetalleTicket(detalle);
             out = "{\"result\":\"Detalle agregado correctamente\"}";
         } catch (Exception e) {
-            out = "{\"result\":\"Error al agregar el detalle\"}";
+            out = "{\"result\":\"Error al agregar el detalle: " + e.getMessage() + "\"}";
+        }
+        return Response.ok(out).build();
+    }
+
+    // Obtener todas las comandas para la cola de pedidos
+    @Path("getallQueue")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAllQueue() {
+        String out;
+        try {
+            List<Comanda> comandas = controller.getAllQueue();
+            out = gson.toJson(comandas);
+        } catch (Exception e) {
+            out = "{\"result\":\"Error al obtener la cola de pedidos: " + e.getMessage() + "\"}";
+        }
+        return Response.ok(out).build();
+    }
+
+    // Actualizar el estatus de una comanda
+    @Path("updateEstatus")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updateEstatus(@QueryParam("idComanda") int idComanda, @QueryParam("estatus") int estatus) {
+        String out;
+        try {
+            controller.updateEstatus(idComanda, estatus);
+            out = "{\"result\":\"Estatus actualizado correctamente\"}";
+        } catch (Exception e) {
+            out = "{\"result\":\"Error al actualizar el estatus: " + e.getMessage() + "\"}";
         }
         return Response.ok(out).build();
     }

@@ -29,6 +29,7 @@ public class RestFilter implements ContainerRequestFilter {
                 path.contains("ticket/insert") || 
                 path.contains("ticket/estatus") || 
                 path.contains("ticket/pagado") ||
+                path.contains("ticket/getallQueue") ||
                 path.contains("ticket/detalle/insert") ||
                 path.contains("alimento/getallCliente") ||
                 path.contains("bebida/getallCliente") ||
